@@ -1,12 +1,12 @@
 # Carousel Image Generator
 
-Generate beautiful carousel slide images with perfect text positioning. No more spacing issues.
+Generate beautiful carousel slide images with perfect text positioning. Uses Satori for SVG rendering and Resvg for PNG conversion - no browser needed.
 
-## Setup (5 minutes)
+## Setup
 
 ### Step 1: Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/carousel-image-generator)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bearonawalk13/carousel-image-generator)
 
 Or manually:
 1. Fork this repo to your GitHub
@@ -118,9 +118,6 @@ const CONFIG = {
   width: 1080,
   height: 1350,
 
-  // Fonts
-  fontFamily: "'Cormorant Garamond', serif",
-
   // Theme colors
   themes: {
     green: {
@@ -145,6 +142,17 @@ After editing, push to GitHub and Vercel will auto-deploy.
 
 ---
 
+## Technical Details
+
+This service uses:
+- **Satori** - Converts HTML-like structures to SVG
+- **Resvg** - Converts SVG to PNG
+- **Cormorant Garamond** - Font loaded from Google Fonts
+
+No browser binaries needed - works reliably on Vercel's serverless infrastructure.
+
+---
+
 ## Limits
 
 Vercel free tier:
@@ -163,6 +171,7 @@ Vercel free tier:
 **Timeout errors?**
 - First request after idle may be slow (cold start)
 - Subsequent requests are fast
+- Font loading happens on each request
 
 **Need help?**
 - Check Vercel function logs in your dashboard
