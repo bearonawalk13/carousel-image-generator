@@ -266,38 +266,31 @@ function swipeElement(colors) {
             children: 'SWIPE'
           }
         },
-        // Arrow: line + chevron
+        // Arrow: line with chevron at end (matching template)
         {
           type: 'div',
           props: {
             style: {
-              display: 'flex',
-              alignItems: 'center',
+              position: 'relative',
+              width: d.arrowLineWidth,
+              height: d.arrowLineHeight,
+              backgroundColor: colors.text,
               opacity: 0.7
             },
             children: [
-              // Horizontal line
+              // Chevron positioned at end of line
               {
                 type: 'div',
                 props: {
                   style: {
-                    width: d.arrowLineWidth,
-                    height: d.arrowLineHeight,
-                    backgroundColor: colors.text
-                  }
-                }
-              },
-              // Chevron (angled corner, not triangle)
-              {
-                type: 'div',
-                props: {
-                  style: {
+                    position: 'absolute',
+                    right: -2,
+                    top: -6,
                     width: d.arrowChevronSize,
                     height: d.arrowChevronSize,
                     borderRight: `2px solid ${colors.text}`,
                     borderTop: `2px solid ${colors.text}`,
-                    transform: 'rotate(45deg)',
-                    marginLeft: -d.arrowChevronSize / 2
+                    transform: 'rotate(45deg)'
                   }
                 }
               }
