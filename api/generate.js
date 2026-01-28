@@ -1,5 +1,5 @@
-const chromium = require('@sparticuz/chromium');
-const puppeteer = require('puppeteer-core');
+const satori = require('satori');
+const { Resvg } = require('@resvg/resvg-js');
 
 // =============================================================
 // CONFIGURATION - Edit these values to customize your slides
@@ -8,10 +8,6 @@ const CONFIG = {
   // Image dimensions (Instagram carousel)
   width: 1080,
   height: 1350,
-
-  // Fonts
-  fontFamily: "'Cormorant Garamond', serif",
-  googleFont: "Cormorant+Garamond:wght@400;600;700",
 
   // Theme colors
   themes: {
@@ -49,155 +45,184 @@ const CONFIG = {
 };
 
 // =============================================================
-// HTML TEMPLATES
+// FONT LOADING
 // =============================================================
 
-function baseStyles(theme) {
-  const colors = CONFIG.themes[theme] || CONFIG.themes.green;
-  return `
-    @import url('https://fonts.googleapis.com/css2?family=${CONFIG.googleFont}&display=swap');
+async function loadFont() {
+  // Load Cormorant Garamond from Google Fonts
+  const fontUrl = 'https://fonts.gstatic.com/s/cormorantgaramond/v16/co3bmX5slCNuHLi8bLeY9MK7whWMhyjQAllvuQWJ5heb_w.woff';
+  const fontBoldUrl = 'https://fonts.gstatic.com/s/cormorantgaramond/v16/co3YmX5slCNuHLi8bLeY9MK7whWMhyjYpHtKky2F7i6CYw.woff';
+  const fontItalicUrl = 'https://fonts.gstatic.com/s/cormorantgaramond/v16/co3ZmX5slCNuHLi8bLeY9MK7whWMhyjYrEPjuw-NxBKL_y94.woff';
+  const fontBoldItalicUrl = 'https://fonts.gstatic.com/s/cormorantgaramond/v16/co3WmX5slCNuHLi8bLeY9MK7whWMhyjYpHtKky0ekCitPKTr.woff';
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  const [regular, bold, italic, boldItalic] = await Promise.all([
+    fetch(fontUrl).then(r => r.arrayBuffer()),
+    fetch(fontBoldUrl).then(r => r.arrayBuffer()),
+    fetch(fontItalicUrl).then(r => r.arrayBuffer()),
+    fetch(fontBoldItalicUrl).then(r => r.arrayBuffer())
+  ]);
 
-    body {
-      width: ${CONFIG.width}px;
-      height: ${CONFIG.height}px;
-      background: ${colors.background};
-      font-family: ${CONFIG.fontFamily};
-      color: ${colors.text};
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: ${CONFIG.padding}px;
-      line-height: ${CONFIG.lineHeight};
+  return [
+    { name: 'Cormorant Garamond', data: regular, weight: 400, style: 'normal' },
+    { name: 'Cormorant Garamond', data: bold, weight: 700, style: 'normal' },
+    { name: 'Cormorant Garamond', data: italic, weight: 400, style: 'italic' },
+    { name: 'Cormorant Garamond', data: boldItalic, weight: 700, style: 'italic' }
+  ];
+}
+
+// =============================================================
+// SLIDE TEMPLATES (as React-like elements for Satori)
+// =============================================================
+
+function hookSlide(data, colors) {
+  return {
+    type: 'div',
+    props: {
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.background,
+        padding: CONFIG.padding,
+        textAlign: 'center',
+        gap: 20
+      },
+      children: [
+        data.title_line_1 ? {
+          type: 'div',
+          props: {
+            style: {
+              fontSize: CONFIG.sizes.hookTitle,
+              fontWeight: 700,
+              fontStyle: 'italic',
+              color: colors.text,
+              lineHeight: CONFIG.lineHeight
+            },
+            children: data.title_line_1
+          }
+        } : null,
+        data.title_line_2 ? {
+          type: 'div',
+          props: {
+            style: {
+              fontSize: CONFIG.sizes.hookTitle,
+              fontWeight: 700,
+              fontStyle: 'italic',
+              color: colors.gold,
+              lineHeight: CONFIG.lineHeight
+            },
+            children: data.title_line_2
+          }
+        } : null
+      ].filter(Boolean)
     }
-
-    .gold { color: ${colors.gold}; }
-    .bold { font-weight: 700; }
-    .italic { font-style: italic; }
-    .center { text-align: center; }
-  `;
+  };
 }
 
-function hookTemplate(data, theme) {
-  const colors = CONFIG.themes[theme] || CONFIG.themes.green;
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        ${baseStyles(theme)}
-        .hook-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          gap: 20px;
+function bodySlide(data, colors) {
+  const bodyLines = (data.body_lines || []).map(line => ({
+    type: 'div',
+    props: {
+      style: {
+        fontSize: CONFIG.sizes.bodyText,
+        fontWeight: 400,
+        color: colors.text,
+        marginBottom: 16,
+        lineHeight: CONFIG.lineHeight
+      },
+      children: line
+    }
+  }));
+
+  return {
+    type: 'div',
+    props: {
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.background,
+        padding: CONFIG.padding
+      },
+      children: [
+        data.headline ? {
+          type: 'div',
+          props: {
+            style: {
+              fontSize: CONFIG.sizes.bodyHeadline,
+              fontWeight: 700,
+              color: colors.text,
+              marginBottom: CONFIG.headlineBodyGap,
+              lineHeight: CONFIG.lineHeight
+            },
+            children: data.headline
+          }
+        } : null,
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', flexDirection: 'column' },
+            children: bodyLines
+          }
         }
-        .hook-line {
-          font-size: ${CONFIG.sizes.hookTitle}px;
-          font-weight: 700;
-          font-style: italic;
-        }
-        .line1 { color: ${colors.text}; }
-        .line2 { color: ${colors.gold}; }
-      </style>
-    </head>
-    <body>
-      <div class="hook-container">
-        <div class="hook-line line1">${data.title_line_1 || ''}</div>
-        <div class="hook-line line2">${data.title_line_2 || ''}</div>
-      </div>
-    </body>
-    </html>
-  `;
+      ].filter(Boolean)
+    }
+  };
 }
 
-function bodyTemplate(data, theme) {
-  const colors = CONFIG.themes[theme] || CONFIG.themes.green;
-  const bodyLines = (data.body_lines || []).map(line =>
-    `<div class="body-line">${line}</div>`
-  ).join('');
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        ${baseStyles(theme)}
-        .body-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          height: 100%;
-        }
-        .headline {
-          font-size: ${CONFIG.sizes.bodyHeadline}px;
-          font-weight: 700;
-          margin-bottom: ${CONFIG.headlineBodyGap}px;
-          color: ${colors.text};
-        }
-        .body-line {
-          font-size: ${CONFIG.sizes.bodyText}px;
-          font-weight: 400;
-          margin-bottom: 16px;
-          color: ${colors.text};
-        }
-      </style>
-    </head>
-    <body>
-      <div class="body-container">
-        ${data.headline ? `<div class="headline">${data.headline}</div>` : ''}
-        <div class="body-content">${bodyLines}</div>
-      </div>
-    </body>
-    </html>
-  `;
-}
-
-function ctaTemplate(data, theme) {
-  const colors = CONFIG.themes[theme] || CONFIG.themes.green;
+function ctaSlide(data, colors) {
   const lines = (data.lines || []).map(line => {
     let size = CONFIG.sizes.ctaBody;
     let color = colors.text;
-    let weight = '400';
+    let weight = 400;
 
     if (line.style === 'title') {
       size = CONFIG.sizes.ctaTitle;
-      weight = '600';
+      weight = 600;
     } else if (line.style === 'action') {
       size = CONFIG.sizes.ctaAction;
       color = colors.gold;
-      weight = '700';
+      weight = 700;
     }
 
-    return `<div style="font-size: ${size}px; color: ${color}; font-weight: ${weight}; margin-bottom: 24px;">${line.text}</div>`;
-  }).join('');
+    return {
+      type: 'div',
+      props: {
+        style: {
+          fontSize: size,
+          fontWeight: weight,
+          color: color,
+          marginBottom: 24,
+          lineHeight: CONFIG.lineHeight,
+          textAlign: 'center'
+        },
+        children: line.text
+      }
+    };
+  });
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        ${baseStyles(theme)}
-        .cta-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          height: 100%;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="cta-container">
-        ${lines}
-      </div>
-    </body>
-    </html>
-  `;
+  return {
+    type: 'div',
+    props: {
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.background,
+        padding: CONFIG.padding,
+        textAlign: 'center'
+      },
+      children: lines
+    }
+  };
 }
 
 // =============================================================
@@ -218,8 +243,6 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  let browser = null;
-
   try {
     const { type, theme = 'green', data } = req.body;
 
@@ -227,53 +250,51 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Missing type or data' });
     }
 
-    // Generate HTML based on slide type
-    let html;
+    const colors = CONFIG.themes[theme] || CONFIG.themes.green;
+
+    // Generate slide element based on type
+    let element;
     switch (type) {
       case 'hook':
-        html = hookTemplate(data, theme);
+        element = hookSlide(data, colors);
         break;
       case 'body':
-        html = bodyTemplate(data, theme);
+        element = bodySlide(data, colors);
         break;
       case 'cta':
-        html = ctaTemplate(data, theme);
+        element = ctaSlide(data, colors);
         break;
       default:
         return res.status(400).json({ error: 'Invalid type. Use: hook, body, or cta' });
     }
 
-    // Launch browser with Vercel-compatible settings
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: {
-        width: CONFIG.width,
-        height: CONFIG.height
-      },
-      executablePath: await chromium.executablePath(),
-      headless: 'new'
+    // Load fonts
+    const fonts = await loadFont();
+
+    // Render to SVG using Satori
+    const svg = await satori(element, {
+      width: CONFIG.width,
+      height: CONFIG.height,
+      fonts
     });
 
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-
-    // Wait for fonts to load
-    await page.evaluateHandle('document.fonts.ready');
-
-    const screenshot = await page.screenshot({ type: 'png' });
-    await browser.close();
-    browser = null;
+    // Convert SVG to PNG using Resvg
+    const resvg = new Resvg(svg, {
+      fitTo: {
+        mode: 'width',
+        value: CONFIG.width
+      }
+    });
+    const pngData = resvg.render();
+    const pngBuffer = pngData.asPng();
 
     // Return image
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', 'public, max-age=31536000');
-    return res.send(screenshot);
+    return res.send(pngBuffer);
 
   } catch (error) {
     console.error('Error generating image:', error);
-    if (browser) {
-      await browser.close();
-    }
     return res.status(500).json({ error: error.message });
   }
 };
