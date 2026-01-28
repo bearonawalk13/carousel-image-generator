@@ -243,11 +243,7 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid type. Use: hook, body, or cta' });
     }
 
-    // Configure chromium for Vercel
-    chromium.setHeadlessMode = true;
-    chromium.setGraphicsMode = false;
-
-    // Launch browser
+    // Launch browser with Vercel-compatible settings
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: {
@@ -255,7 +251,7 @@ module.exports = async function handler(req, res) {
         height: CONFIG.height
       },
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless
+      headless: 'new'
     });
 
     const page = await browser.newPage();
