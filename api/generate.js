@@ -37,8 +37,8 @@ const CONFIG = {
     hookTitle: 72,
     bodyHeadline: 56,
     bodyText: 48,
-    ctaTitle: 48,
-    ctaAction: 80,
+    ctaTitle: 56,
+    ctaAction: 72,
     ctaBody: 48
   },
 
@@ -159,7 +159,6 @@ function bodyTemplate(data, theme) {
 function ctaTemplate(data, theme) {
   const colors = CONFIG.themes[theme] || CONFIG.themes.green;
   const lines = (data.lines || []).map(line => {
-    let style = '';
     let size = CONFIG.sizes.ctaBody;
     let color = colors.text;
     let weight = '400';
@@ -219,6 +218,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  let browser = null;
+
   try {
     const { type, theme = 'green', data } = req.body;
 
@@ -242,8 +243,12 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid type. Use: hook, body, or cta' });
     }
 
+    // Configure chromium for Vercel
+    chromium.setHeadlessMode = true;
+    chromium.setGraphicsMode = false;
+
     // Launch browser
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: {
         width: CONFIG.width,
@@ -261,6 +266,7 @@ module.exports = async function handler(req, res) {
 
     const screenshot = await page.screenshot({ type: 'png' });
     await browser.close();
+    browser = null;
 
     // Return image
     res.setHeader('Content-Type', 'image/png');
@@ -269,6 +275,9 @@ module.exports = async function handler(req, res) {
 
   } catch (error) {
     console.error('Error generating image:', error);
+    if (browser) {
+      await browser.close();
+    }
     return res.status(500).json({ error: error.message });
   }
 };
