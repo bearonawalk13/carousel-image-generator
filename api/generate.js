@@ -1,4 +1,4 @@
-const satori = require('satori');
+const satori = require('satori').default;
 const { Resvg } = require('@resvg/resvg-js');
 
 // =============================================================
