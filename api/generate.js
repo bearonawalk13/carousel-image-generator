@@ -2,7 +2,7 @@ const satori = require('satori').default;
 const { Resvg } = require('@resvg/resvg-js');
 
 // =============================================================
-// CONFIGURATION
+// CONFIGURATION (scaled from 20% preview to 1080x1350)
 // =============================================================
 const CONFIG = {
   width: 1080,
@@ -34,6 +34,32 @@ const CONFIG = {
     ctaTitle: 56,
     ctaAction: 72,
     ctaBody: 48
+  },
+
+  // Design element sizes (scaled 5x from 20% preview)
+  design: {
+    goldLineWidth: 2,
+    goldLineHeight: 120,
+    handleBottom: 70,
+    handleLeft: 70,
+    handleFontSize: 30,
+    handleLetterSpacing: 6,
+    cornerSize: 15,
+    swipeBottom: 70,
+    swipeRight: 70,
+    swipeFontSize: 30,
+    swipeLetterSpacing: 6,
+    swipeGap: 20,
+    arrowLineWidth: 55,
+    arrowLineHeight: 2,
+    arrowChevronSize: 12,
+    slideNumberTop: 60,
+    slideNumberRight: 60,
+    slideNumberSize: 105,
+    slideNumberFontSize: 45,
+    connectLineRightWidth: 110,
+    connectLineLeftWidth: 70,
+    connectLineHeight: 2
   },
 
   padding: 80,
@@ -68,10 +94,10 @@ async function loadFont() {
 }
 
 // =============================================================
-// DESIGN ELEMENTS
+// DESIGN ELEMENTS (matching preview_all_themes.html exactly)
 // =============================================================
 
-// Gold line at top (for hook slides)
+// Gold line at top (for hook slides) - centered using left calc
 function goldLineTop(colors) {
   return {
     type: 'div',
@@ -79,10 +105,9 @@ function goldLineTop(colors) {
       style: {
         position: 'absolute',
         top: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 2,
-        height: 120,
+        left: (CONFIG.width - CONFIG.design.goldLineWidth) / 2,
+        width: CONFIG.design.goldLineWidth,
+        height: CONFIG.design.goldLineHeight,
         background: `linear-gradient(180deg, ${colors.gold} 0%, ${colors.gold} 60%, transparent 100%)`,
         opacity: 0.8
       }
@@ -90,7 +115,7 @@ function goldLineTop(colors) {
   };
 }
 
-// Gold line at bottom (for CTA slides)
+// Gold line at bottom (for CTA slides) - centered using left calc
 function goldLineBottom(colors) {
   return {
     type: 'div',
@@ -98,10 +123,9 @@ function goldLineBottom(colors) {
       style: {
         position: 'absolute',
         bottom: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 2,
-        height: 120,
+        left: (CONFIG.width - CONFIG.design.goldLineWidth) / 2,
+        width: CONFIG.design.goldLineWidth,
+        height: CONFIG.design.goldLineHeight,
         background: `linear-gradient(0deg, ${colors.gold} 0%, ${colors.gold} 60%, transparent 100%)`,
         opacity: 0.8
       }
@@ -109,15 +133,52 @@ function goldLineBottom(colors) {
   };
 }
 
-// Handle with corner brackets
-function handleElement(colors) {
+// Connecting line on right edge (fades from transparent to gold)
+function connectLineRight(colors) {
   return {
     type: 'div',
     props: {
       style: {
         position: 'absolute',
-        bottom: 70,
-        left: 70,
+        right: 0,
+        top: (CONFIG.height - CONFIG.design.connectLineHeight) / 2,
+        width: CONFIG.design.connectLineRightWidth,
+        height: CONFIG.design.connectLineHeight,
+        background: `linear-gradient(90deg, transparent 0%, ${colors.gold} 100%)`,
+        opacity: 0.6
+      }
+    }
+  };
+}
+
+// Connecting line on left edge (fades from gold to transparent)
+function connectLineLeft(colors) {
+  return {
+    type: 'div',
+    props: {
+      style: {
+        position: 'absolute',
+        left: 0,
+        top: (CONFIG.height - CONFIG.design.connectLineHeight) / 2,
+        width: CONFIG.design.connectLineLeftWidth,
+        height: CONFIG.design.connectLineHeight,
+        background: `linear-gradient(90deg, ${colors.gold} 0%, transparent 100%)`,
+        opacity: 0.6
+      }
+    }
+  };
+}
+
+// Handle with corner brackets
+function handleElement(colors) {
+  const d = CONFIG.design;
+  return {
+    type: 'div',
+    props: {
+      style: {
+        position: 'absolute',
+        bottom: d.handleBottom,
+        left: d.handleLeft,
         display: 'flex',
         alignItems: 'center'
       },
@@ -128,13 +189,13 @@ function handleElement(colors) {
           props: {
             style: {
               position: 'absolute',
-              bottom: -4,
-              left: -8,
-              width: 12,
-              height: 12,
+              bottom: -5,
+              left: -5,
+              width: d.cornerSize,
+              height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
               borderBottom: `1px solid ${colors.gold}`,
-              opacity: 0.4
+              opacity: 0.6
             }
           }
         },
@@ -143,12 +204,13 @@ function handleElement(colors) {
           type: 'div',
           props: {
             style: {
-              fontSize: 24,
+              fontSize: d.handleFontSize,
               fontWeight: 500,
-              letterSpacing: 4,
+              letterSpacing: d.handleLetterSpacing,
               textTransform: 'uppercase',
               color: colors.text,
-              opacity: 0.55
+              opacity: 0.7,
+              padding: '5px 10px'
             },
             children: CONFIG.handle
           }
@@ -159,13 +221,13 @@ function handleElement(colors) {
           props: {
             style: {
               position: 'absolute',
-              top: -4,
-              right: -8,
-              width: 12,
-              height: 12,
+              top: -5,
+              right: -5,
+              width: d.cornerSize,
+              height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
               borderTop: `1px solid ${colors.gold}`,
-              opacity: 0.4
+              opacity: 0.6
             }
           }
         }
@@ -174,65 +236,68 @@ function handleElement(colors) {
   };
 }
 
-// Swipe indicator with arrow
+// Swipe indicator with chevron arrow (not triangle)
 function swipeElement(colors) {
+  const d = CONFIG.design;
   return {
     type: 'div',
     props: {
       style: {
         position: 'absolute',
-        bottom: 70,
-        right: 70,
+        bottom: d.swipeBottom,
+        right: d.swipeRight,
         display: 'flex',
         alignItems: 'center',
-        gap: 16
+        gap: d.swipeGap
       },
       children: [
+        // SWIPE text
         {
           type: 'div',
           props: {
             style: {
-              fontSize: 24,
+              fontSize: d.swipeFontSize,
               fontWeight: 500,
-              letterSpacing: 4,
+              letterSpacing: d.swipeLetterSpacing,
               textTransform: 'uppercase',
               color: colors.text,
-              opacity: 0.55
+              opacity: 0.7
             },
             children: 'SWIPE'
           }
         },
-        // Arrow line with head
+        // Arrow: line + chevron
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              opacity: 0.7
             },
             children: [
+              // Horizontal line
               {
                 type: 'div',
                 props: {
                   style: {
-                    width: 45,
-                    height: 1,
-                    backgroundColor: colors.text,
-                    opacity: 0.55
+                    width: d.arrowLineWidth,
+                    height: d.arrowLineHeight,
+                    backgroundColor: colors.text
                   }
                 }
               },
+              // Chevron (angled corner, not triangle)
               {
                 type: 'div',
                 props: {
                   style: {
-                    width: 0,
-                    height: 0,
-                    borderTop: '5px solid transparent',
-                    borderBottom: '5px solid transparent',
-                    borderLeft: `8px solid ${colors.text}`,
-                    opacity: 0.55,
-                    marginLeft: -1
+                    width: d.arrowChevronSize,
+                    height: d.arrowChevronSize,
+                    borderRight: `2px solid ${colors.text}`,
+                    borderTop: `2px solid ${colors.text}`,
+                    transform: 'rotate(45deg)',
+                    marginLeft: -d.arrowChevronSize / 2
                   }
                 }
               }
@@ -244,20 +309,25 @@ function swipeElement(colors) {
   };
 }
 
-// Slide number circle
+// Slide number circle - border has opacity, number is visible
 function slideNumber(num, colors) {
+  const d = CONFIG.design;
+  // Create rgba border color with 35% opacity (slightly more visible)
+  const borderColor = colors.text === '#f5f3ef'
+    ? 'rgba(245, 243, 239, 0.35)'
+    : 'rgba(12, 31, 26, 0.35)';
+
   return {
     type: 'div',
     props: {
       style: {
         position: 'absolute',
-        top: 60,
-        right: 60,
-        width: 90,
-        height: 90,
+        top: d.slideNumberTop,
+        right: d.slideNumberRight,
+        width: d.slideNumberSize,
+        height: d.slideNumberSize,
         borderRadius: '50%',
-        border: `1px solid ${colors.text}`,
-        opacity: 0.25,
+        border: `1px solid ${borderColor}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -266,10 +336,11 @@ function slideNumber(num, colors) {
         type: 'div',
         props: {
           style: {
-            fontSize: 40,
+            fontSize: d.slideNumberFontSize,
             fontWeight: 400,
             color: colors.text,
-            opacity: 1
+            opacity: 0.7,
+            paddingBottom: 5
           },
           children: String(num)
         }
@@ -300,6 +371,7 @@ function hookSlide(data, colors) {
       },
       children: [
         goldLineTop(colors),
+        connectLineRight(colors),
         // Content container
         {
           type: 'div',
@@ -378,6 +450,8 @@ function bodySlide(data, colors, slideNum) {
       },
       children: [
         slideNumber(slideNum, colors),
+        connectLineLeft(colors),
+        connectLineRight(colors),
         // Content container
         {
           type: 'div',
@@ -466,6 +540,7 @@ function ctaSlide(data, colors) {
         textAlign: 'center'
       },
       children: [
+        connectLineLeft(colors),
         goldLineBottom(colors),
         {
           type: 'div',
