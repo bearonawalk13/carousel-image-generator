@@ -1,0 +1,12 @@
+{
+  "name": "carousel-image-generator",
+  "version": "1.0.0",
+  "description": "Generate carousel slide images with perfect text positioning",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "^119.0.2",
+    "puppeteer-core": "^21.5.2"
+  }
+}
