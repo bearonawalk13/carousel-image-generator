@@ -266,16 +266,17 @@ function swipeElement(colors) {
             children: 'SWIPE'
           }
         },
-        // Long arrow (line + arrow head)
+        // Long arrow (dashes + arrow head)
         {
           type: 'div',
           props: {
             style: {
-              fontSize: d.swipeFontSize + 4,
+              fontSize: d.swipeFontSize,
               color: colors.text,
-              lineHeight: 1
+              lineHeight: 1,
+              letterSpacing: -2
             },
-            children: '⟶'
+            children: '———›'
           }
         }
       ]
