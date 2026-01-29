@@ -190,7 +190,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               bottom: 3,
-              left: 8,
+              left: 5,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
@@ -222,7 +222,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               top: 3,
-              right: 8,
+              right: 5,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
