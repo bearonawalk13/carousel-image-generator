@@ -169,7 +169,8 @@ function parseStyledText(text, baseWeight = 500) {
           props: {
             style: {
               fontWeight: baseWeight,
-              fontStyle: 'normal'
+              fontStyle: 'normal',
+              whiteSpace: 'pre-wrap'  // Preserve spaces
             },
             children: plainText
           }
@@ -185,7 +186,8 @@ function parseStyledText(text, baseWeight = 500) {
         props: {
           style: {
             fontWeight: 700,
-            fontStyle: 'normal'
+            fontStyle: 'normal',
+            whiteSpace: 'pre-wrap'  // Preserve spaces
           },
           children: match[2]
         }
@@ -197,7 +199,8 @@ function parseStyledText(text, baseWeight = 500) {
         props: {
           style: {
             fontWeight: baseWeight,
-            fontStyle: 'italic'
+            fontStyle: 'italic',
+            whiteSpace: 'pre-wrap'  // Preserve spaces
           },
           children: match[3]
         }
@@ -216,7 +219,8 @@ function parseStyledText(text, baseWeight = 500) {
         props: {
           style: {
             fontWeight: baseWeight,
-            fontStyle: 'normal'
+            fontStyle: 'normal',
+            whiteSpace: 'pre-wrap'  // Preserve spaces
           },
           children: plainText
         }
