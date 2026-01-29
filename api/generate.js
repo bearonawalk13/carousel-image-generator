@@ -70,13 +70,29 @@ const CONFIG = {
 // =============================================================
 // FONT LOADING
 // =============================================================
-async function loadFont() {
-  const fontUrls = {
-    regular: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf',
-    bold: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_hg9GnM.ttf',
-    italic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd58jDOjw.ttf',
-    boldItalic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5FTfOjw.ttf'
+async function loadFont(fontFamily = 'Cormorant Garamond') {
+  const fontConfigs = {
+    'Cormorant Garamond': {
+      regular: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf',
+      bold: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_hg9GnM.ttf',
+      italic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd58jDOjw.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5FTfOjw.ttf'
+    },
+    'Lora': {
+      regular: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuxJBkq0.ttf',
+      bold: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787z6vBJBkq0.ttf',
+      italic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFoq92nA.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-A4CoqV2nA.ttf'
+    },
+    'Source Serif Pro': {
+      regular: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjipdqrhxXD-wGvjU.ttf',
+      bold: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjiklqrhxXD-wGvjU.ttf',
+      italic: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QYxoUQEjBQ.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QfJvUQEjBQ.ttf'
+    }
   };
+
+  const fontUrls = fontConfigs[fontFamily] || fontConfigs['Cormorant Garamond'];
 
   const [regular, bold, italic, boldItalic] = await Promise.all([
     fetch(fontUrls.regular).then(r => r.arrayBuffer()),
@@ -86,10 +102,10 @@ async function loadFont() {
   ]);
 
   return [
-    { name: 'Cormorant Garamond', data: regular, weight: 400, style: 'normal' },
-    { name: 'Cormorant Garamond', data: bold, weight: 700, style: 'normal' },
-    { name: 'Cormorant Garamond', data: italic, weight: 400, style: 'italic' },
-    { name: 'Cormorant Garamond', data: boldItalic, weight: 700, style: 'italic' }
+    { name: fontFamily, data: regular, weight: 400, style: 'normal' },
+    { name: fontFamily, data: bold, weight: 700, style: 'normal' },
+    { name: fontFamily, data: italic, weight: 400, style: 'italic' },
+    { name: fontFamily, data: boldItalic, weight: 700, style: 'italic' }
   ];
 }
 
@@ -739,7 +755,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { type, theme = 'green', data, slide_number = 2 } = req.body;
+    const { type, theme = 'green', data, slide_number = 2, font = 'Cormorant Garamond' } = req.body;
 
     if (!type || !data) {
       return res.status(400).json({ error: 'Missing type or data' });
@@ -762,7 +778,7 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid type. Use: hook, body, or cta' });
     }
 
-    const fonts = await loadFont();
+    const fonts = await loadFont(font);
 
     const svg = await satori(element, {
       width: CONFIG.width,
