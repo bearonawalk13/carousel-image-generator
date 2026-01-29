@@ -266,31 +266,38 @@ function swipeElement(colors) {
             children: 'SWIPE'
           }
         },
-        // Arrow: line with chevron at end (matching template)
+        // Arrow: line + chevron
         {
           type: 'div',
           props: {
             style: {
-              position: 'relative',
-              width: d.arrowLineWidth,
-              height: d.arrowLineHeight,
-              backgroundColor: colors.text,
+              display: 'flex',
+              alignItems: 'center',
               opacity: 0.7
             },
             children: [
-              // Chevron positioned at end of line
+              // Horizontal line
               {
                 type: 'div',
                 props: {
                   style: {
-                    position: 'absolute',
-                    right: -2,
-                    top: -6,
+                    width: d.arrowLineWidth,
+                    height: d.arrowLineHeight,
+                    backgroundColor: colors.text
+                  }
+                }
+              },
+              // Chevron (angled corner, not triangle)
+              {
+                type: 'div',
+                props: {
+                  style: {
                     width: d.arrowChevronSize,
                     height: d.arrowChevronSize,
                     borderRight: `2px solid ${colors.text}`,
                     borderTop: `2px solid ${colors.text}`,
-                    transform: 'rotate(45deg)'
+                    transform: 'rotate(45deg)',
+                    marginLeft: -d.arrowChevronSize / 2
                   }
                 }
               }
@@ -346,72 +353,66 @@ function slideNumber(num, colors) {
 // SLIDE TEMPLATES
 // =============================================================
 
-// Helper: Parse text with highlight word and return inline elements
-function parseHighlightedText(text, highlight, colors) {
-  if (!highlight || !text.includes(highlight)) {
-    // No highlight, return plain text
-    return text;
-  }
-
-  // Split text around the highlight word
-  const parts = text.split(highlight);
-  const elements = [];
-
-  parts.forEach((part, index) => {
-    // Add the text before highlight
-    if (part) {
-      elements.push({
-        type: 'span',
-        props: {
-          style: { color: colors.text },
-          children: part
-        }
-      });
-    }
-    // Add the highlighted word (except after the last part)
-    if (index < parts.length - 1) {
-      elements.push({
-        type: 'span',
-        props: {
-          style: { color: colors.gold },
-          children: highlight
-        }
-      });
-    }
-  });
-
-  return elements;
-}
-
 function hookSlide(data, colors) {
-  // Support two formats:
-  // 1. New: { text: "full sentence", highlight: "word" }
-  // 2. Legacy: { title_line_1: "...", title_line_2: "..." }
+  // Build the title content based on format
+  let titleContent;
 
-  let contentChildren;
+  if (data.text && data.highlight) {
+    // New format: single-word gold highlighting
+    // Split text around the highlight word
+    const highlightWord = data.highlight;
+    const text = data.text;
+    const highlightIndex = text.toLowerCase().indexOf(highlightWord.toLowerCase());
 
-  if (data.text) {
-    // New format: single text with optional highlight word
-    contentChildren = [{
-      type: 'div',
-      props: {
-        style: {
-          fontSize: CONFIG.sizes.hookTitle,
-          fontWeight: 700,
-          fontStyle: 'italic',
-          color: colors.text,
-          lineHeight: CONFIG.lineHeight,
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center'
-        },
-        children: parseHighlightedText(data.text, data.highlight, colors)
-      }
-    }];
-  } else {
-    // Legacy format: two separate lines
-    contentChildren = [
-      data.title_line_1 ? {
+    if (highlightIndex !== -1) {
+      const before = text.slice(0, highlightIndex);
+      const highlighted = text.slice(highlightIndex, highlightIndex + highlightWord.length);
+      const after = text.slice(highlightIndex + highlightWord.length);
+
+      // Create inline text with highlighted word - must use flexWrap for multi-word lines
+      titleContent = {
+        type: 'div',
+        props: {
+          style: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'baseline',
+            fontSize: CONFIG.sizes.hookTitle,
+            fontWeight: 700,
+            fontStyle: 'italic',
+            lineHeight: CONFIG.lineHeight,
+            maxWidth: 900,
+            textAlign: 'center'
+          },
+          children: [
+            before ? {
+              type: 'span',
+              props: {
+                style: { color: colors.text },
+                children: before
+              }
+            } : null,
+            {
+              type: 'span',
+              props: {
+                style: { color: colors.gold },
+                children: highlighted
+              }
+            },
+            after ? {
+              type: 'span',
+              props: {
+                style: { color: colors.text },
+                children: after
+              }
+            } : null
+          ].filter(Boolean)
+        }
+      };
+    } else {
+      // Highlight word not found, render as plain text
+      titleContent = {
         type: 'div',
         props: {
           style: {
@@ -419,25 +420,56 @@ function hookSlide(data, colors) {
             fontWeight: 700,
             fontStyle: 'italic',
             color: colors.text,
-            lineHeight: CONFIG.lineHeight
+            lineHeight: CONFIG.lineHeight,
+            maxWidth: 900,
+            textAlign: 'center'
           },
-          children: data.title_line_1
+          children: text
         }
-      } : null,
-      data.title_line_2 ? {
-        type: 'div',
-        props: {
-          style: {
-            fontSize: CONFIG.sizes.hookTitle,
-            fontWeight: 700,
-            fontStyle: 'italic',
-            color: colors.gold,
-            lineHeight: CONFIG.lineHeight
-          },
-          children: data.title_line_2
-        }
-      } : null
-    ].filter(Boolean);
+      };
+    }
+  } else {
+    // Legacy format: title_line_1 (white) + title_line_2 (gold)
+    titleContent = {
+      type: 'div',
+      props: {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 20
+        },
+        children: [
+          data.title_line_1 ? {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: CONFIG.sizes.hookTitle,
+                fontWeight: 700,
+                fontStyle: 'italic',
+                color: colors.text,
+                lineHeight: CONFIG.lineHeight
+              },
+              children: data.title_line_1
+            }
+          } : null,
+          data.title_line_2 ? {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: CONFIG.sizes.hookTitle,
+                fontWeight: 700,
+                fontStyle: 'italic',
+                color: colors.gold,
+                lineHeight: CONFIG.lineHeight
+              },
+              children: data.title_line_2
+            }
+          } : null
+        ].filter(Boolean)
+      }
+    };
   }
 
   return {
@@ -459,19 +491,7 @@ function hookSlide(data, colors) {
         goldLineTop(colors),
         connectLineRight(colors),
         // Content container
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 20
-            },
-            children: contentChildren
-          }
-        },
+        titleContent,
         handleElement(colors),
         swipeElement(colors)
       ]
