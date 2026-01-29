@@ -70,29 +70,41 @@ const CONFIG = {
 // =============================================================
 // FONT LOADING
 // =============================================================
-async function loadFont(fontFamily = 'Cormorant Garamond') {
-  const fontConfigs = {
-    'Cormorant Garamond': {
+// Font configurations for testing
+const FONT_OPTIONS = {
+  cormorant: {
+    name: 'Cormorant Garamond',
+    urls: {
       regular: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf',
       bold: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_hg9GnM.ttf',
       italic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd58jDOjw.ttf',
       boldItalic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5FTfOjw.ttf'
-    },
-    'Lora': {
-      regular: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuxJBkq0.ttf',
-      bold: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787z6vBJBkq0.ttf',
-      italic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFoq92nA.ttf',
-      boldItalic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-A4CoqV2nA.ttf'
-    },
-    'Source Serif Pro': {
-      regular: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjipdqrhxXD-wGvjU.ttf',
-      bold: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjiklqrhxXD-wGvjU.ttf',
-      italic: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QYxoUQEjBQ.ttf',
-      boldItalic: 'https://fonts.gstatic.com/s/sourceserif4/v8/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QfJvUQEjBQ.ttf'
     }
-  };
+  },
+  lora: {
+    name: 'Lora',
+    urls: {
+      regular: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuxJBkq0.ttf',
+      bold: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787z5vBJBkq0.ttf',
+      italic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFoq92nA.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-A4Coq92nA.ttf'
+    }
+  },
+  sourceSerif: {
+    name: 'Source Serif Pro',
+    urls: {
+      regular: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIQzD-0qpwxpaWvjeD0X88SAOeaiXM0oSOL2Yvo.ttf',
+      bold: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIXzD-0qpwxpaWvjeD0X88SAOeasc8btSKqxKcsdrM.ttf',
+      italic: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIWzD-0qpwxpaWvjeD0X88SAOeauXEGbSqqwacqdrM.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIVzD-0qpwxpaWvjeD0X88SAOeav5OGSXO9JX5RXkQJhw.ttf'
+    }
+  }
+};
 
-  const fontUrls = fontConfigs[fontFamily] || fontConfigs['Cormorant Garamond'];
+async function loadFont(fontKey = 'cormorant') {
+  const fontConfig = FONT_OPTIONS[fontKey] || FONT_OPTIONS.cormorant;
+  const fontUrls = fontConfig.urls;
+  const fontName = fontConfig.name;
 
   const [regular, bold, italic, boldItalic] = await Promise.all([
     fetch(fontUrls.regular).then(r => r.arrayBuffer()),
@@ -102,10 +114,10 @@ async function loadFont(fontFamily = 'Cormorant Garamond') {
   ]);
 
   return [
-    { name: fontFamily, data: regular, weight: 400, style: 'normal' },
-    { name: fontFamily, data: bold, weight: 700, style: 'normal' },
-    { name: fontFamily, data: italic, weight: 400, style: 'italic' },
-    { name: fontFamily, data: boldItalic, weight: 700, style: 'italic' }
+    { name: fontName, data: regular, weight: 400, style: 'normal' },
+    { name: fontName, data: bold, weight: 700, style: 'normal' },
+    { name: fontName, data: italic, weight: 400, style: 'italic' },
+    { name: fontName, data: boldItalic, weight: 700, style: 'italic' }
   ];
 }
 
@@ -477,20 +489,24 @@ function hookSlide(data, colors) {
       };
     });
 
+    // Support alignment option (default: center)
+    const align = data.align || 'center';
+    const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+
     titleContent = {
       type: 'div',
       props: {
         style: {
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'flex-start',
+          justifyContent: justifyMap[align] || 'center',
           alignItems: 'baseline',
           fontSize: CONFIG.sizes.hookTitle,
           fontWeight: 700,
           fontStyle: 'italic',
           lineHeight: CONFIG.lineHeight,
           maxWidth: 950,
-          textAlign: 'left'
+          textAlign: align
         },
         children: wordElements
       }
@@ -566,13 +582,13 @@ function hookSlide(data, colors) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
         backgroundColor: colors.background,
         padding: CONFIG.padding,
-        textAlign: 'left'
+        textAlign: 'center'
       },
       children: [
         goldLineTop(colors),
@@ -755,7 +771,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { type, theme = 'green', data, slide_number = 2, font = 'Cormorant Garamond' } = req.body;
+    const { type, theme = 'green', data, slide_number = 2, font = 'cormorant' } = req.body;
 
     if (!type || !data) {
       return res.status(400).json({ error: 'Missing type or data' });
