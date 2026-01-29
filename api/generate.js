@@ -99,6 +99,9 @@ async function loadFont() {
 
 // Gold line at top (for hook slides) - centered using left calc
 function goldLineTop(colors) {
+  // Use gold at 0 opacity instead of 'transparent' to avoid color interpolation issues
+  // CSS 'transparent' is rgba(0,0,0,0) which creates visual differences on light vs dark backgrounds
+  const goldTransparent = 'rgba(197, 155, 61, 0)';
   return {
     type: 'div',
     props: {
@@ -108,7 +111,7 @@ function goldLineTop(colors) {
         left: (CONFIG.width - CONFIG.design.goldLineWidth) / 2,
         width: CONFIG.design.goldLineWidth,
         height: CONFIG.design.goldLineHeight,
-        background: `linear-gradient(180deg, ${colors.gold} 0%, ${colors.gold} 60%, transparent 100%)`,
+        background: `linear-gradient(180deg, ${colors.gold} 0%, ${colors.gold} 60%, ${goldTransparent} 100%)`,
         opacity: 0.8
       }
     }
@@ -117,6 +120,7 @@ function goldLineTop(colors) {
 
 // Gold line at bottom (for CTA slides) - centered using left calc
 function goldLineBottom(colors) {
+  const goldTransparent = 'rgba(197, 155, 61, 0)';
   return {
     type: 'div',
     props: {
@@ -126,7 +130,7 @@ function goldLineBottom(colors) {
         left: (CONFIG.width - CONFIG.design.goldLineWidth) / 2,
         width: CONFIG.design.goldLineWidth,
         height: CONFIG.design.goldLineHeight,
-        background: `linear-gradient(0deg, ${colors.gold} 0%, ${colors.gold} 60%, transparent 100%)`,
+        background: `linear-gradient(0deg, ${colors.gold} 0%, ${colors.gold} 60%, ${goldTransparent} 100%)`,
         opacity: 0.8
       }
     }
@@ -135,6 +139,7 @@ function goldLineBottom(colors) {
 
 // Connecting line on right edge (fades from transparent to gold)
 function connectLineRight(colors) {
+  const goldTransparent = 'rgba(197, 155, 61, 0)';
   return {
     type: 'div',
     props: {
@@ -144,7 +149,7 @@ function connectLineRight(colors) {
         top: (CONFIG.height - CONFIG.design.connectLineHeight) / 2,
         width: CONFIG.design.connectLineRightWidth,
         height: CONFIG.design.connectLineHeight,
-        background: `linear-gradient(90deg, transparent 0%, ${colors.gold} 100%)`,
+        background: `linear-gradient(90deg, ${goldTransparent} 0%, ${colors.gold} 100%)`,
         opacity: 0.6
       }
     }
@@ -153,6 +158,7 @@ function connectLineRight(colors) {
 
 // Connecting line on left edge (fades from gold to transparent)
 function connectLineLeft(colors) {
+  const goldTransparent = 'rgba(197, 155, 61, 0)';
   return {
     type: 'div',
     props: {
@@ -162,7 +168,7 @@ function connectLineLeft(colors) {
         top: (CONFIG.height - CONFIG.design.connectLineHeight) / 2,
         width: CONFIG.design.connectLineLeftWidth,
         height: CONFIG.design.connectLineHeight,
-        background: `linear-gradient(90deg, ${colors.gold} 0%, transparent 100%)`,
+        background: `linear-gradient(90deg, ${colors.gold} 0%, ${goldTransparent} 100%)`,
         opacity: 0.6
       }
     }
