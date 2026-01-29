@@ -28,12 +28,12 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 84,       // Increased from 72 for more impact
-    bodyHeadline: 56,
-    bodyText: 48,
-    ctaTitle: 56,
-    ctaAction: 96,       // Increased from 72 for more impact
-    ctaBody: 48
+    hookTitle: 168,      // Doubled for maximum impact
+    bodyHeadline: 70,    // Increased for mobile readability
+    bodyText: 60,        // Increased for mobile readability
+    ctaTitle: 70,        // Increased for mobile readability
+    ctaAction: 120,      // Increased for mobile readability
+    ctaBody: 60          // Increased for mobile readability
   },
 
   // Design element sizes (scaled 5x from 20% preview)
