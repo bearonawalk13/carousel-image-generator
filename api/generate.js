@@ -190,7 +190,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               bottom: 3,
-              left: 5,
+              left: 3,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
