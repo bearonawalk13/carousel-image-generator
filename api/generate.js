@@ -222,7 +222,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               top: 3,
-              right: 9,
+              right: 10,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
