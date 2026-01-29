@@ -467,14 +467,14 @@ function hookSlide(data, colors) {
         style: {
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           alignItems: 'baseline',
           fontSize: CONFIG.sizes.hookTitle,
           fontWeight: 700,
           fontStyle: 'italic',
           lineHeight: CONFIG.lineHeight,
           maxWidth: 950,
-          textAlign: 'center'
+          textAlign: 'left'
         },
         children: wordElements
       }
@@ -550,13 +550,13 @@ function hookSlide(data, colors) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
         backgroundColor: colors.background,
         padding: CONFIG.padding,
-        textAlign: 'center'
+        textAlign: 'left'
       },
       children: [
         goldLineTop(colors),
