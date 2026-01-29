@@ -28,7 +28,7 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 168,      // Doubled for maximum impact
+    hookTitle: 112,      // Balanced for impact + readability
     bodyHeadline: 70,    // Increased for mobile readability
     bodyText: 60,        // Increased for mobile readability
     ctaTitle: 70,        // Increased for mobile readability
