@@ -183,14 +183,14 @@ function handleElement(colors) {
         alignItems: 'center'
       },
       children: [
-        // Corner bracket bottom-left (tight to text)
+        // Corner bracket bottom-left (very tight to text)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
               bottom: 0,
-              left: -3,
+              left: -1,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
@@ -215,14 +215,14 @@ function handleElement(colors) {
             children: CONFIG.handle
           }
         },
-        // Corner bracket top-right (tight to text)
+        // Corner bracket top-right (very tight to text)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
               top: 0,
-              right: -3,
+              right: -1,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
@@ -236,7 +236,7 @@ function handleElement(colors) {
   };
 }
 
-// Swipe indicator with chevron arrow (not triangle)
+// Swipe indicator with arrow
 function swipeElement(colors) {
   const d = CONFIG.design;
   return {
@@ -248,7 +248,8 @@ function swipeElement(colors) {
         right: d.swipeRight,
         display: 'flex',
         alignItems: 'center',
-        gap: d.swipeGap
+        gap: d.swipeGap,
+        opacity: 0.7
       },
       children: [
         // SWIPE text
@@ -260,48 +261,21 @@ function swipeElement(colors) {
               fontWeight: 500,
               letterSpacing: d.swipeLetterSpacing,
               textTransform: 'uppercase',
-              color: colors.text,
-              opacity: 0.7
+              color: colors.text
             },
             children: 'SWIPE'
           }
         },
-        // Arrow: line + chevron
+        // Simple arrow character
         {
           type: 'div',
           props: {
             style: {
-              display: 'flex',
-              alignItems: 'center',
-              opacity: 0.7
+              fontSize: d.swipeFontSize + 4,
+              color: colors.text,
+              lineHeight: 1
             },
-            children: [
-              // Horizontal line
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    width: d.arrowLineWidth,
-                    height: d.arrowLineHeight,
-                    backgroundColor: colors.text
-                  }
-                }
-              },
-              // Chevron (angled corner, not triangle)
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    width: d.arrowChevronSize,
-                    height: d.arrowChevronSize,
-                    borderRight: `2px solid ${colors.text}`,
-                    borderTop: `2px solid ${colors.text}`,
-                    transform: 'rotate(45deg)',
-                    marginLeft: -d.arrowChevronSize / 2
-                  }
-                }
-              }
-            ]
+            children: '→'
           }
         }
       ]
