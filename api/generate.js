@@ -118,7 +118,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
             style: {
               color: colors.text,
               fontWeight: baseWeight,
-              fontStyle: 'normal'
+              fontStyle: 'normal',
+              whiteSpace: 'pre-wrap'
             },
             children: plainText
           }
@@ -135,7 +136,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
           style: {
             color: colors.text,
             fontWeight: 700,
-            fontStyle: 'normal'
+            fontStyle: 'normal',
+            whiteSpace: 'pre-wrap'
           },
           children: match[2]
         }
@@ -148,7 +150,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
           style: {
             color: colors.text,
             fontWeight: baseWeight,
-            fontStyle: 'italic'
+            fontStyle: 'italic',
+            whiteSpace: 'pre-wrap'
           },
           children: match[3]
         }
@@ -168,7 +171,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
           style: {
             color: colors.text,
             fontWeight: baseWeight,
-            fontStyle: 'normal'
+            fontStyle: 'normal',
+            whiteSpace: 'pre-wrap'
           },
           children: plainText
         }
