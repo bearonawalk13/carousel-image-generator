@@ -389,21 +389,21 @@ function hookSlide(data, colors) {
             before ? {
               type: 'span',
               props: {
-                style: { color: colors.text },
+                style: { color: colors.text, whiteSpace: 'pre-wrap' },
                 children: before
               }
             } : null,
             {
               type: 'span',
               props: {
-                style: { color: colors.gold },
+                style: { color: colors.gold, whiteSpace: 'pre-wrap' },
                 children: highlighted
               }
             },
             after ? {
               type: 'span',
               props: {
-                style: { color: colors.text },
+                style: { color: colors.text, whiteSpace: 'pre-wrap' },
                 children: after
               }
             } : null
