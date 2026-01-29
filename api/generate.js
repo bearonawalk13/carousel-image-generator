@@ -574,18 +574,7 @@ function hookSlide(data, colors) {
 function bodySlide(data, colors, slideNum) {
   const bodyLines = (data.body_lines || []).map(line => {
     const styledContent = parseStyledText(line, colors, 400);
-
-    // If styled content is an array (has markup), wrap in flex container
-    const children = Array.isArray(styledContent) ? {
-      type: 'div',
-      props: {
-        style: {
-          display: 'flex',
-          flexWrap: 'wrap'
-        },
-        children: styledContent
-      }
-    } : styledContent;
+    const hasMarkup = Array.isArray(styledContent);
 
     return {
       type: 'div',
@@ -595,9 +584,11 @@ function bodySlide(data, colors, slideNum) {
           fontWeight: 400,
           color: colors.text,
           marginBottom: 16,
-          lineHeight: CONFIG.lineHeight
+          lineHeight: CONFIG.lineHeight,
+          // Must have display:flex when children is an array of elements
+          ...(hasMarkup ? { display: 'flex', flexWrap: 'wrap' } : {})
         },
-        children: children
+        children: styledContent
       }
     };
   });
