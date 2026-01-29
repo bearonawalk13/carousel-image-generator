@@ -190,7 +190,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               bottom: 0,
-              left: -1,
+              left: 0,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
@@ -222,7 +222,7 @@ function handleElement(colors) {
             style: {
               position: 'absolute',
               top: 0,
-              right: -1,
+              right: 0,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
@@ -266,7 +266,7 @@ function swipeElement(colors) {
             children: 'SWIPE'
           }
         },
-        // Simple arrow character
+        // Long arrow (line + arrow head)
         {
           type: 'div',
           props: {
@@ -275,7 +275,7 @@ function swipeElement(colors) {
               color: colors.text,
               lineHeight: 1
             },
-            children: '→'
+            children: '⟶'
           }
         }
       ]
