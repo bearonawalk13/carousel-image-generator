@@ -51,8 +51,8 @@ const CONFIG = {
     swipeLetterSpacing: 6,
     swipeGap: 20,
     arrowLineWidth: 55,
-    arrowLineHeight: 2,
-    arrowChevronSize: 12,
+    arrowLineHeight: 1,
+    arrowChevronSize: 15,
     slideNumberTop: 60,
     slideNumberRight: 60,
     slideNumberSize: 105,
@@ -183,14 +183,14 @@ function handleElement(colors) {
         alignItems: 'center'
       },
       children: [
-        // Corner bracket bottom-left
+        // Corner bracket bottom-left (tight to text)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
-              bottom: -5,
-              left: -5,
+              bottom: 0,
+              left: -3,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
@@ -215,14 +215,14 @@ function handleElement(colors) {
             children: CONFIG.handle
           }
         },
-        // Corner bracket top-right
+        // Corner bracket top-right (tight to text)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
-              top: -5,
-              right: -5,
+              top: 0,
+              right: -3,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
