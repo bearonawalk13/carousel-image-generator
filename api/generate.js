@@ -84,19 +84,19 @@ const FONT_OPTIONS = {
   lora: {
     name: 'Lora',
     urls: {
-      regular: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuxJBkq0.ttf',
-      bold: 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787z5vBJBkq0.ttf',
-      italic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFoq92nA.ttf',
-      boldItalic: 'https://fonts.gstatic.com/s/lora/v35/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-A4Coq92nA.ttf'
+      regular: 'https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787weuyJG.ttf',
+      bold: 'https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787z5vCJG.ttf',
+      italic: 'https://fonts.gstatic.com/s/lora/v37/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFkqg.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/lora/v37/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-C0Ckqg.ttf'
     }
   },
   sourceSerif: {
-    name: 'Source Serif Pro',
+    name: 'Source Serif 4',
     urls: {
-      regular: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIQzD-0qpwxpaWvjeD0X88SAOeaiXM0oSOL2Yvo.ttf',
-      bold: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIXzD-0qpwxpaWvjeD0X88SAOeasc8btSKqxKcsdrM.ttf',
-      italic: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIWzD-0qpwxpaWvjeD0X88SAOeauXEGbSqqwacqdrM.ttf',
-      boldItalic: 'https://fonts.gstatic.com/s/sourceserifpro/v21/neIVzD-0qpwxpaWvjeD0X88SAOeav5OGSXO9JX5RXkQJhw.ttf'
+      regular: 'https://fonts.gstatic.com/s/sourceserif4/v14/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QYxoUKIkn98pRl9dCw.ttf',
+      bold: 'https://fonts.gstatic.com/s/sourceserif4/v14/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QYxoUKIkn98poVhdCw.ttf',
+      italic: 'https://fonts.gstatic.com/s/sourceserif4/v14/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjihdqrhw.ttf',
+      boldItalic: 'https://fonts.gstatic.com/s/sourceserif4/v14/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjivBtrhw.ttf'
     }
   }
 };
