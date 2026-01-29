@@ -183,14 +183,14 @@ function handleElement(colors) {
         alignItems: 'center'
       },
       children: [
-        // Corner bracket bottom-left (very tight to text)
+        // Corner bracket bottom-left (tight to text, accounting for padding)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
-              bottom: 0,
-              left: 0,
+              bottom: 3,
+              left: 8,
               width: d.cornerSize,
               height: d.cornerSize,
               borderLeft: `1px solid ${colors.gold}`,
@@ -215,14 +215,14 @@ function handleElement(colors) {
             children: CONFIG.handle
           }
         },
-        // Corner bracket top-right (very tight to text)
+        // Corner bracket top-right (tight to text, accounting for padding)
         {
           type: 'div',
           props: {
             style: {
               position: 'absolute',
-              top: 0,
-              right: 0,
+              top: 3,
+              right: 8,
               width: d.cornerSize,
               height: d.cornerSize,
               borderRight: `1px solid ${colors.gold}`,
