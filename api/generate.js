@@ -596,6 +596,10 @@ function hookSlide(data, colors) {
     };
   }
 
+  // Support slide-level alignment
+  const align = data.align || 'center';
+  const alignItemsMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+
   return {
     type: 'div',
     props: {
@@ -603,13 +607,13 @@ function hookSlide(data, colors) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: alignItemsMap[align] || 'center',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
         backgroundColor: colors.background,
         padding: CONFIG.padding,
-        textAlign: 'center'
+        textAlign: align
       },
       children: [
         goldLineTop(colors),
