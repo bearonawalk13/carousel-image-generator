@@ -28,11 +28,11 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 72,
+    hookTitle: 84,       // Increased from 72 for more impact
     bodyHeadline: 56,
     bodyText: 48,
     ctaTitle: 56,
-    ctaAction: 72,
+    ctaAction: 96,       // Increased from 72 for more impact
     ctaBody: 48
   },
 
@@ -435,58 +435,53 @@ function hookSlide(data, colors) {
 
   if (data.text && data.highlight) {
     // New format: single-word gold highlighting
-    // Split text around the highlight word
-    const highlightWord = data.highlight;
+    // Split text into words so flex wrapping happens at word boundaries
+    const highlightWord = data.highlight.toLowerCase();
     const text = data.text;
-    const highlightIndex = text.toLowerCase().indexOf(highlightWord.toLowerCase());
+    const words = text.split(' ');
 
-    if (highlightIndex !== -1) {
-      const before = text.slice(0, highlightIndex);
-      const highlighted = text.slice(highlightIndex, highlightIndex + highlightWord.length);
-      const after = text.slice(highlightIndex + highlightWord.length);
+    // Create a span for each word, highlighting the matching one
+    const wordElements = words.map((word, i) => {
+      // Check if this word contains the highlight (handles punctuation)
+      const wordLower = word.toLowerCase();
+      const isHighlight = wordLower === highlightWord ||
+                          wordLower.startsWith(highlightWord) ||
+                          wordLower.endsWith(highlightWord);
 
-      // Create inline text with highlighted word - must use flexWrap for multi-word lines
-      titleContent = {
-        type: 'div',
+      return {
+        type: 'span',
         props: {
           style: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'baseline',
-            fontSize: CONFIG.sizes.hookTitle,
-            fontWeight: 700,
-            fontStyle: 'italic',
-            lineHeight: CONFIG.lineHeight,
-            maxWidth: 900,
-            textAlign: 'center'
+            color: isHighlight ? colors.gold : colors.text,
+            whiteSpace: 'pre'
           },
-          children: [
-            before ? {
-              type: 'span',
-              props: {
-                style: { color: colors.text, whiteSpace: 'pre-wrap' },
-                children: before
-              }
-            } : null,
-            {
-              type: 'span',
-              props: {
-                style: { color: colors.gold, whiteSpace: 'pre-wrap' },
-                children: highlighted
-              }
-            },
-            after ? {
-              type: 'span',
-              props: {
-                style: { color: colors.text, whiteSpace: 'pre-wrap' },
-                children: after
-              }
-            } : null
-          ].filter(Boolean)
+          // Add space after each word except the last
+          children: i < words.length - 1 ? word + ' ' : word
         }
       };
-    } else {
+    });
+
+    titleContent = {
+      type: 'div',
+      props: {
+        style: {
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'baseline',
+          fontSize: CONFIG.sizes.hookTitle,
+          fontWeight: 700,
+          fontStyle: 'italic',
+          lineHeight: CONFIG.lineHeight,
+          maxWidth: 950,
+          textAlign: 'center'
+        },
+        children: wordElements
+      }
+    };
+
+    // Fallback if no words (shouldn't happen)
+    if (wordElements.length === 0) {
       // Highlight word not found, render as plain text
       titleContent = {
         type: 'div',
@@ -660,6 +655,8 @@ function ctaSlide(data, colors) {
     let size = CONFIG.sizes.ctaBody;
     let color = colors.text;
     let weight = 400;
+    let marginTop = 0;
+    let marginBottom = 24;
 
     if (line.style === 'title') {
       size = CONFIG.sizes.ctaTitle;
@@ -668,6 +665,9 @@ function ctaSlide(data, colors) {
       size = CONFIG.sizes.ctaAction;
       color = colors.gold;
       weight = 700;
+      // Add extra spacing above and below action for emphasis
+      marginTop = 40;
+      marginBottom = 40;
     }
 
     return {
@@ -677,7 +677,8 @@ function ctaSlide(data, colors) {
           fontSize: size,
           fontWeight: weight,
           color: color,
-          marginBottom: 24,
+          marginTop: marginTop,
+          marginBottom: marginBottom,
           lineHeight: CONFIG.lineHeight,
           textAlign: 'center'
         },
