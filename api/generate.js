@@ -76,8 +76,10 @@ const FONT_OPTIONS = {
     name: 'Cormorant Garamond',
     urls: {
       regular: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf',
+      medium: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_s06GnM.ttf',
       bold: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_hg9GnM.ttf',
       italic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd58jDOjw.ttf',
+      mediumItalic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5wDDOjw.ttf',
       boldItalic: 'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5FTfOjw.ttf'
     }
   },
@@ -106,19 +108,41 @@ async function loadFont(fontKey = 'cormorant') {
   const fontUrls = fontConfig.urls;
   const fontName = fontConfig.name;
 
-  const [regular, bold, italic, boldItalic] = await Promise.all([
+  // Check if medium weights are available (only cormorant has them)
+  const hasMedium = fontUrls.medium && fontUrls.mediumItalic;
+
+  const fetches = [
     fetch(fontUrls.regular).then(r => r.arrayBuffer()),
     fetch(fontUrls.bold).then(r => r.arrayBuffer()),
     fetch(fontUrls.italic).then(r => r.arrayBuffer()),
     fetch(fontUrls.boldItalic).then(r => r.arrayBuffer())
-  ]);
+  ];
 
-  return [
+  if (hasMedium) {
+    fetches.push(
+      fetch(fontUrls.medium).then(r => r.arrayBuffer()),
+      fetch(fontUrls.mediumItalic).then(r => r.arrayBuffer())
+    );
+  }
+
+  const results = await Promise.all(fetches);
+  const [regular, bold, italic, boldItalic] = results;
+
+  const fonts = [
     { name: fontName, data: regular, weight: 400, style: 'normal' },
     { name: fontName, data: bold, weight: 700, style: 'normal' },
     { name: fontName, data: italic, weight: 400, style: 'italic' },
     { name: fontName, data: boldItalic, weight: 700, style: 'italic' }
   ];
+
+  if (hasMedium) {
+    fonts.push(
+      { name: fontName, data: results[4], weight: 500, style: 'normal' },
+      { name: fontName, data: results[5], weight: 500, style: 'italic' }
+    );
+  }
+
+  return fonts;
 }
 
 // =============================================================
@@ -126,8 +150,8 @@ async function loadFont(fontKey = 'cormorant') {
 // =============================================================
 
 // Parse markdown-style **bold** and *italic* markers in text
-// Returns array of styled Satori elements
-function parseStyledText(text, colors, baseWeight = 400) {
+// Returns a wrapper element with inline styled spans (fixes line-break issues)
+function parseStyledText(text, baseWeight = 500) {
   const segments = [];
 
   // Regex to match **bold** or *italic* (bold first to handle ** before *)
@@ -144,10 +168,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
           type: 'span',
           props: {
             style: {
-              color: colors.text,
               fontWeight: baseWeight,
-              fontStyle: 'normal',
-              whiteSpace: 'pre-wrap'
+              fontStyle: 'normal'
             },
             children: plainText
           }
@@ -162,10 +184,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
         type: 'span',
         props: {
           style: {
-            color: colors.text,
             fontWeight: 700,
-            fontStyle: 'normal',
-            whiteSpace: 'pre-wrap'
+            fontStyle: 'normal'
           },
           children: match[2]
         }
@@ -176,10 +196,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
         type: 'span',
         props: {
           style: {
-            color: colors.text,
             fontWeight: baseWeight,
-            fontStyle: 'italic',
-            whiteSpace: 'pre-wrap'
+            fontStyle: 'italic'
           },
           children: match[3]
         }
@@ -197,10 +215,8 @@ function parseStyledText(text, colors, baseWeight = 400) {
         type: 'span',
         props: {
           style: {
-            color: colors.text,
             fontWeight: baseWeight,
-            fontStyle: 'normal',
-            whiteSpace: 'pre-wrap'
+            fontStyle: 'normal'
           },
           children: plainText
         }
@@ -208,11 +224,12 @@ function parseStyledText(text, colors, baseWeight = 400) {
     }
   }
 
-  // If no styling found, return plain text
+  // If no styling found, return plain text string
   if (segments.length === 0) {
     return text;
   }
 
+  // Return segments wrapped in a container that preserves inline flow
   return segments;
 }
 
@@ -604,7 +621,7 @@ function hookSlide(data, colors) {
 
 function bodySlide(data, colors, slideNum) {
   const bodyLines = (data.body_lines || []).map(line => {
-    const styledContent = parseStyledText(line, colors, 400);
+    const styledContent = parseStyledText(line, 500);
     const hasMarkup = Array.isArray(styledContent);
 
     return {
@@ -612,12 +629,12 @@ function bodySlide(data, colors, slideNum) {
       props: {
         style: {
           fontSize: CONFIG.sizes.bodyText,
-          fontWeight: 400,
+          fontWeight: 500,
           color: colors.text,
           marginBottom: 16,
           lineHeight: CONFIG.lineHeight,
-          // Must have display:flex when children is an array of elements
-          ...(hasMarkup ? { display: 'flex', flexWrap: 'wrap' } : {})
+          // Use display:flex for styled spans, but NO flexWrap to prevent line-break issues
+          ...(hasMarkup ? { display: 'flex' } : {})
         },
         children: styledContent
       }
@@ -686,7 +703,7 @@ function ctaSlide(data, colors) {
   const lines = (data.lines || []).map(line => {
     let size = CONFIG.sizes.ctaBody;
     let color = colors.text;
-    let weight = 400;
+    let weight = 500;  // Slightly bolder than 400 for better readability
     let marginTop = 0;
     let marginBottom = 24;
 
