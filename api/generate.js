@@ -621,11 +621,8 @@ function hookSlide(data, colors) {
 
 function bodySlide(data, colors, slideNum) {
   const bodyLines = (data.body_lines || []).map(line => {
-    // Strip markdown markers and render as plain text with 500 weight
-    // This avoids Satori's flex rendering issues with inline styled spans
-    const plainText = line
-      .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove **bold** markers
-      .replace(/\*([^*]+)\*/g, '$1');      // Remove *italic* markers
+    const styledContent = parseStyledText(line, 500);
+    const hasMarkup = Array.isArray(styledContent);
 
     return {
       type: 'div',
@@ -635,9 +632,15 @@ function bodySlide(data, colors, slideNum) {
           fontWeight: 500,
           color: colors.text,
           marginBottom: 16,
-          lineHeight: CONFIG.lineHeight
+          lineHeight: CONFIG.lineHeight,
+          // Use flex with baseline alignment to fix text overlap issues
+          ...(hasMarkup ? {
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'baseline'  // KEY: prevents vertical misalignment
+          } : {})
         },
-        children: plainText
+        children: styledContent
       }
     };
   });
