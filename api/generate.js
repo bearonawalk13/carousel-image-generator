@@ -94,6 +94,97 @@ async function loadFont() {
 }
 
 // =============================================================
+// TEXT STYLING PARSER
+// =============================================================
+
+// Parse markdown-style **bold** and *italic* markers in text
+// Returns array of styled Satori elements
+function parseStyledText(text, colors, baseWeight = 400) {
+  const segments = [];
+
+  // Regex to match **bold** or *italic* (bold first to handle ** before *)
+  const pattern = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    // Add plain text before this match
+    if (match.index > lastIndex) {
+      const plainText = text.slice(lastIndex, match.index);
+      if (plainText) {
+        segments.push({
+          type: 'span',
+          props: {
+            style: {
+              color: colors.text,
+              fontWeight: baseWeight,
+              fontStyle: 'normal'
+            },
+            children: plainText
+          }
+        });
+      }
+    }
+
+    // Determine if bold (**) or italic (*)
+    if (match[2]) {
+      // Bold match (group 2)
+      segments.push({
+        type: 'span',
+        props: {
+          style: {
+            color: colors.text,
+            fontWeight: 700,
+            fontStyle: 'normal'
+          },
+          children: match[2]
+        }
+      });
+    } else if (match[3]) {
+      // Italic match (group 3)
+      segments.push({
+        type: 'span',
+        props: {
+          style: {
+            color: colors.text,
+            fontWeight: baseWeight,
+            fontStyle: 'italic'
+          },
+          children: match[3]
+        }
+      });
+    }
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  // Add remaining plain text after last match
+  if (lastIndex < text.length) {
+    const plainText = text.slice(lastIndex);
+    if (plainText) {
+      segments.push({
+        type: 'span',
+        props: {
+          style: {
+            color: colors.text,
+            fontWeight: baseWeight,
+            fontStyle: 'normal'
+          },
+          children: plainText
+        }
+      });
+    }
+  }
+
+  // If no styling found, return plain text
+  if (segments.length === 0) {
+    return text;
+  }
+
+  return segments;
+}
+
+// =============================================================
 // DESIGN ELEMENTS (matching preview_all_themes.html exactly)
 // =============================================================
 
@@ -481,19 +572,35 @@ function hookSlide(data, colors) {
 }
 
 function bodySlide(data, colors, slideNum) {
-  const bodyLines = (data.body_lines || []).map(line => ({
-    type: 'div',
-    props: {
-      style: {
-        fontSize: CONFIG.sizes.bodyText,
-        fontWeight: 400,
-        color: colors.text,
-        marginBottom: 16,
-        lineHeight: CONFIG.lineHeight
-      },
-      children: line
-    }
-  }));
+  const bodyLines = (data.body_lines || []).map(line => {
+    const styledContent = parseStyledText(line, colors, 400);
+
+    // If styled content is an array (has markup), wrap in flex container
+    const children = Array.isArray(styledContent) ? {
+      type: 'div',
+      props: {
+        style: {
+          display: 'flex',
+          flexWrap: 'wrap'
+        },
+        children: styledContent
+      }
+    } : styledContent;
+
+    return {
+      type: 'div',
+      props: {
+        style: {
+          fontSize: CONFIG.sizes.bodyText,
+          fontWeight: 400,
+          color: colors.text,
+          marginBottom: 16,
+          lineHeight: CONFIG.lineHeight
+        },
+        children: children
+      }
+    };
+  });
 
   return {
     type: 'div',
