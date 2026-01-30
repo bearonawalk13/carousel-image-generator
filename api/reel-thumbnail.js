@@ -60,7 +60,7 @@ const CONFIG = {
     bottom: 0,
     left: 50,
     right: 50,
-    textCenterY: 960  // Always centered
+    textCenterY: 850  // Slightly above center
   },
 
   padding: 70,
