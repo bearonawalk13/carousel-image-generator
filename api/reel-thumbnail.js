@@ -65,7 +65,7 @@ const CONFIG = {
     // - "middle": Put text in true center (Y ~960)
     // - "bottom": Put text in lower area (Y ~1400)
     textPositions: {
-      top: 500,       // Upper third
+      top: 380,       // Higher up for better visibility
       middle: 960,    // True center of image
       bottom: 1400    // Lower third
     },
