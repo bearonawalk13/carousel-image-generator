@@ -32,8 +32,8 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 85,
-    hookSubtitle: 65
+    hookTitle: 110,  // Increased from 85 for better visibility
+    hookSubtitle: 75
   },
 
   design: {
@@ -47,11 +47,20 @@ const CONFIG = {
   // Right ~100px: engagement icons
   safeZone: {
     top: 200,
-    bottom: 470,
+    bottom: 470,  // from bottom
     left: 50,
     right: 100,
-    // Center of safe zone: (200 + (1920-470)) / 2 = 825
-    textCenterY: 825
+    // Safe zone Y range: 200 to 1450 (height 1250)
+    // Positions for text based on face location:
+    // - "top": Face is below, put text in upper third -> Y ~350
+    // - "middle": Face covers screen, put text centered -> Y ~825
+    // - "bottom": Face is above, put text in lower third -> Y ~1200
+    textPositions: {
+      top: 400,      // Upper third of safe zone
+      middle: 825,   // Center of safe zone
+      bottom: 1150   // Lower third of safe zone
+    },
+    textCenterY: 825  // Default (legacy)
   },
 
   padding: 70,
@@ -119,8 +128,14 @@ async function loadFont(fontKey = 'cormorant') {
 // =============================================================
 // REEL THUMBNAIL SLIDE
 // =============================================================
-function reelThumbnailSlide(data, colors) {
+function reelThumbnailSlide(data, colors, textPosition = 'middle') {
   const cfg = CONFIG;
+
+  // Get text Y position based on face_position parameter
+  // "top" = face is at bottom, so put text at top
+  // "bottom" = face is at top, so put text at bottom
+  // "middle" = face covers screen, put text in middle
+  const textCenterY = cfg.safeZone.textPositions[textPosition] || cfg.safeZone.textPositions.middle;
 
   // Build hook text with gold highlighting
   let hookContent;
@@ -308,10 +323,10 @@ function reelThumbnailSlide(data, colors) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'flex-start',
-          // Position text at safe zone center (Y=825)
-          // paddingTop = safeZoneCenter - estimatedTextHeight/2
-          // For ~2 lines of text at 85px + line height, roughly 220px total
-          paddingTop: cfg.safeZone.textCenterY - 110,
+          // Position text based on face position
+          // paddingTop = textCenterY - estimatedTextHeight/2
+          // For ~2 lines of text at 110px + line height, roughly 290px total
+          paddingTop: textCenterY - 145,
           paddingLeft: cfg.safeZone.left,
           paddingRight: cfg.safeZone.right
         },
@@ -352,7 +367,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { theme = 'dark', data, font = 'cormorant' } = req.body;
+    const { theme = 'dark', data, font = 'cormorant', text_position = 'middle' } = req.body;
 
     if (!data) {
       return res.status(400).json({ error: 'Missing data' });
@@ -360,7 +375,8 @@ module.exports = async function handler(req, res) {
 
     const colors = CONFIG.themes[theme] || CONFIG.themes.dark;
 
-    const element = reelThumbnailSlide(data, colors);
+    // text_position: "top" (face at bottom), "middle" (face covers), "bottom" (face at top)
+    const element = reelThumbnailSlide(data, colors, text_position);
     const fonts = await loadFont(font);
 
     const svg = await satori(element, {
