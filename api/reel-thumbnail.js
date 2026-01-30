@@ -54,22 +54,13 @@ const CONFIG = {
   },
 
   // Cover image positioning (no safe zone needed - this is for the cover, not in-feed view)
-  // Full canvas: 1080x1920, center at Y=960
+  // Full canvas: 1080x1920, text always centered at Y=960
   safeZone: {
     top: 0,
     bottom: 0,
     left: 50,
     right: 50,
-    // Text positions based on where face is:
-    // - "top": Put text in upper area (Y ~500)
-    // - "middle": Put text in true center (Y ~960)
-    // - "bottom": Put text in lower area (Y ~1400)
-    textPositions: {
-      top: 380,       // Higher up for better visibility
-      middle: 960,    // True center of image
-      bottom: 1400    // Lower third
-    },
-    textCenterY: 960  // Default to true center
+    textCenterY: 960  // Always centered
   },
 
   padding: 70,
@@ -137,18 +128,15 @@ async function loadFont(fontKey = 'cormorant') {
 // =============================================================
 // REEL THUMBNAIL SLIDE
 // =============================================================
-function reelThumbnailSlide(data, colors, textPosition = 'middle', overlayColor = 'dark') {
+function reelThumbnailSlide(data, colors, overlayColor = 'dark') {
   const cfg = CONFIG;
 
   // Get overlay RGB values
   const overlay = cfg.overlays[overlayColor] || cfg.overlays.dark;
   const overlayRgb = overlay.rgb;
 
-  // Get text Y position based on face_position parameter
-  // "top" = face is at bottom, so put text at top
-  // "bottom" = face is at top, so put text at bottom
-  // "middle" = face covers screen, put text in middle
-  const textCenterY = cfg.safeZone.textPositions[textPosition] || cfg.safeZone.textPositions.middle;
+  // Text always centered at Y=960
+  const textCenterY = cfg.safeZone.textCenterY;
 
   // Build hook text with gold highlighting
   let hookContent;
@@ -380,7 +368,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { theme = 'dark', data, font = 'cormorant', text_position = 'middle', overlay = 'dark' } = req.body;
+    const { theme = 'dark', data, font = 'cormorant', overlay = 'dark' } = req.body;
 
     if (!data) {
       return res.status(400).json({ error: 'Missing data' });
@@ -388,9 +376,9 @@ module.exports = async function handler(req, res) {
 
     const colors = CONFIG.themes[theme] || CONFIG.themes.dark;
 
-    // text_position: "top" (face at bottom), "middle" (face covers), "bottom" (face at top)
     // overlay: "dark" (black) or "green" (royal dark green)
-    const element = reelThumbnailSlide(data, colors, text_position, overlay);
+    // Text is always centered (no top/bottom positioning)
+    const element = reelThumbnailSlide(data, colors, overlay);
     const fonts = await loadFont(font);
 
     const svg = await satori(element, {
