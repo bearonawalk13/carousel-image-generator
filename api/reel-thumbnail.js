@@ -7,7 +7,6 @@ const { Resvg } = require('@resvg/resvg-js');
 const CONFIG = {
   width: 1080,
   height: 1920,
-  handle: 'BASTIANGUGGER',
 
   themes: {
     green: {
@@ -39,12 +38,20 @@ const CONFIG = {
 
   design: {
     goldLineWidth: 2,
-    goldLineHeight: 160,
-    handleBottom: 120,
-    handleLeft: 70,
-    handleFontSize: 28,
-    handleLetterSpacing: 5,
-    cornerSize: 14
+    goldLineHeight: 160
+  },
+
+  // Instagram Reel safe zones (9:16 @ 1080x1920)
+  // Top ~200px: username, follow button
+  // Bottom ~470px: caption, likes, comments, share, audio
+  // Right ~100px: engagement icons
+  safeZone: {
+    top: 200,
+    bottom: 470,
+    left: 50,
+    right: 100,
+    // Center of safe zone: (200 + (1920-470)) / 2 = 825
+    textCenterY: 825
   },
 
   padding: 70,
@@ -236,68 +243,8 @@ function reelThumbnailSlide(data, colors) {
     }
   };
 
-  // Handle element
-  const handleElement = {
-    type: 'div',
-    props: {
-      style: {
-        position: 'absolute',
-        bottom: cfg.design.handleBottom,
-        left: cfg.design.handleLeft,
-        display: 'flex',
-        alignItems: 'center'
-      },
-      children: [
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              bottom: 3,
-              left: 3,
-              width: cfg.design.cornerSize,
-              height: cfg.design.cornerSize,
-              borderLeft: `1px solid ${colors.gold}`,
-              borderBottom: `1px solid ${colors.gold}`,
-              opacity: 0.6
-            }
-          }
-        },
-        {
-          type: 'div',
-          props: {
-            style: {
-              fontSize: cfg.design.handleFontSize,
-              fontWeight: 500,
-              letterSpacing: cfg.design.handleLetterSpacing,
-              textTransform: 'uppercase',
-              color: colors.text,
-              opacity: 0.7,
-              padding: '5px 10px'
-            },
-            children: cfg.handle
-          }
-        },
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              top: 3,
-              right: 10,
-              width: cfg.design.cornerSize,
-              height: cfg.design.cornerSize,
-              borderRight: `1px solid ${colors.gold}`,
-              borderTop: `1px solid ${colors.gold}`,
-              opacity: 0.6
-            }
-          }
-        }
-      ]
-    }
-  };
-
   // Build the full slide
+  // Note: Handle element removed - it's covered by Instagram's bottom UI anyway
   const children = [
     // Background image (if provided)
     data.background_image ? {
@@ -344,10 +291,10 @@ function reelThumbnailSlide(data, colors) {
         }
       }
     } : null,
-    // Gold lines
+    // Gold lines (decorative - ok if partially covered by IG UI)
     goldLineTop,
     goldLineBottom,
-    // Hook content (centered)
+    // Hook content (positioned in Instagram safe zone)
     {
       type: 'div',
       props: {
@@ -360,14 +307,17 @@ function reelThumbnailSlide(data, colors) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: cfg.padding
+          justifyContent: 'flex-start',
+          // Position text at safe zone center (Y=825)
+          // paddingTop = safeZoneCenter - estimatedTextHeight/2
+          // For ~2 lines of text at 85px + line height, roughly 220px total
+          paddingTop: cfg.safeZone.textCenterY - 110,
+          paddingLeft: cfg.safeZone.left,
+          paddingRight: cfg.safeZone.right
         },
         children: hookContent
       }
-    },
-    // Handle
-    handleElement
+    }
   ].filter(Boolean);
 
   return {
