@@ -32,8 +32,8 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 110,  // Increased from 85 for better visibility
-    hookSubtitle: 75
+    hookTitle: 220,  // DOUBLED from 110 for maximum impact
+    hookSubtitle: 150
   },
 
   design: {
@@ -41,26 +41,23 @@ const CONFIG = {
     goldLineHeight: 160
   },
 
-  // Instagram Reel safe zones (9:16 @ 1080x1920)
-  // Top ~200px: username, follow button
-  // Bottom ~470px: caption, likes, comments, share, audio
-  // Right ~100px: engagement icons
+  // Cover image positioning (no safe zone needed - this is for the cover, not in-feed view)
+  // Full canvas: 1080x1920, center at Y=960
   safeZone: {
-    top: 200,
-    bottom: 470,  // from bottom
+    top: 0,
+    bottom: 0,
     left: 50,
-    right: 100,
-    // Safe zone Y range: 200 to 1450 (height 1250)
-    // Positions for text based on face location:
-    // - "top": Face is below, put text in upper third -> Y ~350
-    // - "middle": Face covers screen, put text centered -> Y ~825
-    // - "bottom": Face is above, put text in lower third -> Y ~1200
+    right: 50,
+    // Text positions based on where face is:
+    // - "top": Put text in upper area (Y ~500)
+    // - "middle": Put text in true center (Y ~960)
+    // - "bottom": Put text in lower area (Y ~1400)
     textPositions: {
-      top: 400,      // Upper third of safe zone
-      middle: 825,   // Center of safe zone
-      bottom: 1150   // Lower third of safe zone
+      top: 500,       // Upper third
+      middle: 960,    // True center of image
+      bottom: 1400    // Lower third
     },
-    textCenterY: 825  // Default (legacy)
+    textCenterY: 960  // Default to true center
   },
 
   padding: 70,
@@ -306,10 +303,10 @@ function reelThumbnailSlide(data, colors, textPosition = 'middle') {
         }
       }
     } : null,
-    // Gold lines (decorative - ok if partially covered by IG UI)
+    // Gold lines (decorative)
     goldLineTop,
     goldLineBottom,
-    // Hook content (positioned in Instagram safe zone)
+    // Hook content (positioned based on face location)
     {
       type: 'div',
       props: {
@@ -325,8 +322,8 @@ function reelThumbnailSlide(data, colors, textPosition = 'middle') {
           justifyContent: 'flex-start',
           // Position text based on face position
           // paddingTop = textCenterY - estimatedTextHeight/2
-          // For ~2 lines of text at 110px + line height, roughly 290px total
-          paddingTop: textCenterY - 145,
+          // For ~2 lines of text at 220px + line height, roughly 570px total
+          paddingTop: textCenterY - 285,
           paddingLeft: cfg.safeZone.left,
           paddingRight: cfg.safeZone.right
         },
