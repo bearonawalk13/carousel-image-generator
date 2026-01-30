@@ -58,8 +58,8 @@ const CONFIG = {
   safeZone: {
     top: 0,
     bottom: 0,
-    left: 0,
-    right: 0,
+    left: 50,
+    right: 50,
     // Text positions based on where face is:
     // - "top": Put text in upper area (Y ~500)
     // - "middle": Put text in true center (Y ~960)
