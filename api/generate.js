@@ -809,6 +809,9 @@ module.exports = async function handler(req, res) {
     const colors = CONFIG.themes[theme] || CONFIG.themes.green;
 
     let element;
+    let width = CONFIG.width;
+    let height = CONFIG.height;
+
     switch (type) {
       case 'hook':
         element = hookSlide(data, colors);
@@ -826,13 +829,13 @@ module.exports = async function handler(req, res) {
     const fonts = await loadFont(font);
 
     const svg = await satori(element, {
-      width: CONFIG.width,
-      height: CONFIG.height,
+      width,
+      height,
       fonts
     });
 
     const resvg = new Resvg(svg, {
-      fitTo: { mode: 'width', value: CONFIG.width }
+      fitTo: { mode: 'width', value: width }
     });
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
