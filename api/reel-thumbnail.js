@@ -32,8 +32,8 @@ const CONFIG = {
   },
 
   sizes: {
-    hookTitle: 220,  // DOUBLED from 110 for maximum impact
-    hookSubtitle: 150
+    hookTitle: 150,  // Increased from 110 for better visibility
+    hookSubtitle: 100
   },
 
   design: {
@@ -322,8 +322,8 @@ function reelThumbnailSlide(data, colors, textPosition = 'middle') {
           justifyContent: 'flex-start',
           // Position text based on face position
           // paddingTop = textCenterY - estimatedTextHeight/2
-          // For ~2 lines of text at 220px + line height, roughly 570px total
-          paddingTop: textCenterY - 285,
+          // For ~2 lines of text at 150px + line height, roughly 390px total
+          paddingTop: textCenterY - 195,
           paddingLeft: cfg.safeZone.left,
           paddingRight: cfg.safeZone.right
         },
