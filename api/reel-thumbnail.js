@@ -374,6 +374,7 @@ function reelThumbnailSlide(data, colors) {
     type: 'div',
     props: {
       style: {
+        display: 'flex',
         position: 'relative',
         width: cfg.width,
         height: cfg.height,
