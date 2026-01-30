@@ -41,6 +41,18 @@ const CONFIG = {
     goldLineHeight: 160
   },
 
+  // Overlay color options for background images
+  overlays: {
+    dark: {
+      // Pure black overlay (current default)
+      rgb: '0,0,0'
+    },
+    green: {
+      // Royal dark green overlay
+      rgb: '12,31,26'  // #0c1f1a converted to RGB
+    }
+  },
+
   // Cover image positioning (no safe zone needed - this is for the cover, not in-feed view)
   // Full canvas: 1080x1920, center at Y=960
   safeZone: {
@@ -125,8 +137,12 @@ async function loadFont(fontKey = 'cormorant') {
 // =============================================================
 // REEL THUMBNAIL SLIDE
 // =============================================================
-function reelThumbnailSlide(data, colors, textPosition = 'middle') {
+function reelThumbnailSlide(data, colors, textPosition = 'middle', overlayColor = 'dark') {
   const cfg = CONFIG;
+
+  // Get overlay RGB values
+  const overlay = cfg.overlays[overlayColor] || cfg.overlays.dark;
+  const overlayRgb = overlay.rgb;
 
   // Get text Y position based on face_position parameter
   // "top" = face is at bottom, so put text at top
@@ -273,7 +289,7 @@ function reelThumbnailSlide(data, colors, textPosition = 'middle') {
         }
       }
     } : null,
-    // Dark overlay for text readability
+    // Colored overlay for text readability
     {
       type: 'div',
       props: {
@@ -284,7 +300,7 @@ function reelThumbnailSlide(data, colors, textPosition = 'middle') {
           width: '100%',
           height: '100%',
           background: data.background_image
-            ? 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%)'
+            ? `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
             : 'transparent'
         }
       }
@@ -364,7 +380,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { theme = 'dark', data, font = 'cormorant', text_position = 'middle' } = req.body;
+    const { theme = 'dark', data, font = 'cormorant', text_position = 'middle', overlay = 'dark' } = req.body;
 
     if (!data) {
       return res.status(400).json({ error: 'Missing data' });
@@ -373,7 +389,8 @@ module.exports = async function handler(req, res) {
     const colors = CONFIG.themes[theme] || CONFIG.themes.dark;
 
     // text_position: "top" (face at bottom), "middle" (face covers), "bottom" (face at top)
-    const element = reelThumbnailSlide(data, colors, text_position);
+    // overlay: "dark" (black) or "green" (royal dark green)
+    const element = reelThumbnailSlide(data, colors, text_position, overlay);
     const fonts = await loadFont(font);
 
     const svg = await satori(element, {
