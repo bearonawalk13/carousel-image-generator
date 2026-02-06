@@ -223,8 +223,10 @@ function goldLineTop(colors, width) {
 // QUOTE SLIDE TEMPLATE
 // =============================================================
 
-function quoteSlide(text, colors, size) {
+function quoteSlide(data, colors, size) {
   const { width, height } = size;
+  const text = data.text;
+  const highlight = data.highlight;
 
   // Calculate font size based on dimensions and text length
   let fontSize;
@@ -239,6 +241,69 @@ function quoteSlide(text, colors, size) {
   } else {
     // Facebook (landscape)
     fontSize = textLength > 100 ? 50 : textLength > 60 ? 60 : 70;
+  }
+
+  // Build quote text content with optional gold highlighting
+  let quoteContent;
+
+  if (highlight) {
+    // Split text into words and highlight matching word in gold
+    const highlightWord = highlight.toLowerCase();
+    const words = text.split(' ');
+
+    const wordElements = words.map((word, i) => {
+      const wordLower = word.toLowerCase();
+      // Check if word matches highlight (handles punctuation)
+      const isHighlight = wordLower === highlightWord ||
+                          wordLower.startsWith(highlightWord) ||
+                          wordLower.endsWith(highlightWord) ||
+                          wordLower.includes(highlightWord);
+
+      return {
+        type: 'span',
+        props: {
+          style: {
+            color: isHighlight ? colors.gold : colors.text,
+            whiteSpace: 'pre'
+          },
+          children: i < words.length - 1 ? word + ' ' : word
+        }
+      };
+    });
+
+    quoteContent = {
+      type: 'div',
+      props: {
+        style: {
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'baseline',
+          fontSize: fontSize,
+          fontWeight: 700,
+          fontStyle: 'italic',
+          lineHeight: CONFIG.lineHeight,
+          textAlign: 'center'
+        },
+        children: wordElements
+      }
+    };
+  } else {
+    // No highlighting - simple text
+    quoteContent = {
+      type: 'div',
+      props: {
+        style: {
+          fontSize: fontSize,
+          fontWeight: 700,
+          fontStyle: 'italic',
+          color: colors.text,
+          lineHeight: CONFIG.lineHeight,
+          textAlign: 'center'
+        },
+        children: text
+      }
+    };
   }
 
   return {
@@ -272,20 +337,7 @@ function quoteSlide(text, colors, size) {
               maxWidth: width - (CONFIG.padding * 2),
               marginTop: -40  // Shift up slightly to balance with chevron
             },
-            children: {
-              type: 'div',
-              props: {
-                style: {
-                  fontSize: fontSize,
-                  fontWeight: 700,
-                  fontStyle: 'italic',
-                  color: colors.text,
-                  lineHeight: CONFIG.lineHeight,
-                  textAlign: 'center'
-                },
-                children: text
-              }
-            }
+            children: quoteContent
           }
         },
 
@@ -331,7 +383,7 @@ module.exports = async function handler(req, res) {
     const size = CONFIG.sizes[platform] || CONFIG.sizes.instagram;
     const { width, height } = size;
 
-    const element = quoteSlide(data.text, colors, size);
+    const element = quoteSlide(data, colors, size);
 
     const fonts = await loadFont();
 
