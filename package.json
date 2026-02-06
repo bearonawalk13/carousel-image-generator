@@ -4,6 +4,10 @@
   "description": "Generate carousel slide images with perfect text positioning",
   "dependencies": {
     "satori": "^0.10.11",
-    "@resvg/resvg-js": "^2.6.0"
+    "@resvg/resvg-js": "^2.6.0",
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1",
+    "node-fetch": "^2.7.0",
+    "form-data": "^4.0.0"
   }
 }

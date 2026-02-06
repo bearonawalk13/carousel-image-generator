@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Post Templates - Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', serif;
+      background: #1a1a1a;
+      color: #f5f3ef;
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 400;
+      margin-bottom: 20px;
+      color: #c59b3d;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 60px;
+      opacity: 0.7;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 60px 0 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(197, 155, 61, 0.3);
+      color: #c59b3d;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .preview-card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .preview-card h3 {
+      padding: 15px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      background: rgba(197, 155, 61, 0.1);
+      border-bottom: 1px solid rgba(197, 155, 61, 0.2);
+    }
+
+    .preview-container {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Quote Template Previews (20% scale) */
+    .quote-preview {
+      position: relative;
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Instagram/Threads: 1080x1350 at 20% = 216x270 */
+    .quote-preview.instagram {
+      width: 216px;
+      height: 270px;
+    }
+
+    /* LinkedIn: 1200x1200 at 20% = 240x240 */
+    .quote-preview.linkedin {
+      width: 240px;
+      height: 240px;
+    }
+
+    /* Facebook: 1200x630 at 20% = 240x126 */
+    .quote-preview.facebook {
+      width: 240px;
+      height: 126px;
+    }
+
+    /* Theme colors */
+    .quote-preview.green {
+      background: #0c1f1a;
+      color: #f5f3ef;
+    }
+
+    .quote-preview.white {
+      background: #ede5d8;
+      color: #0c1f1a;
+    }
+
+    .quote-preview.black {
+      background: #0a1315;
+      color: #f5f3ef;
+    }
+
+    /* Gold line at top */
+    .gold-line-top {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 24px;
+      background: linear-gradient(180deg, #c59b3d 0%, #c59b3d 60%, transparent 100%);
+      opacity: 0.8;
+    }
+
+    /* Quote text */
+    .quote-text {
+      font-size: 20px;
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.4;
+      text-align: center;
+      padding: 0 20px;
+      margin-top: -10px;
+    }
+
+    .quote-preview.facebook .quote-text {
+      font-size: 14px;
+    }
+
+    /* Chevron */
+    .chevron-down {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .chevron-down svg {
+      width: 12px;
+      height: 6px;
+    }
+
+    .chevron-down path {
+      stroke: #c59b3d;
+      stroke-width: 0.5;
+      fill: none;
+      opacity: 0.4;
+    }
+
+    /* Handle */
+    .handle {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .handle-text {
+      font-size: 6px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      padding: 1px 2px;
+    }
+
+    .handle .corner-bl {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 3px;
+      height: 3px;
+      border-left: 0.5px solid #c59b3d;
+      border-bottom: 0.5px solid #c59b3d;
+      opacity: 0.6;
+    }
+
+    .handle .corner-tr {
+      position: absolute;
+      top: 0;
+      right: 2px;
+      width: 3px;
+      height: 3px;
+      border-right: 0.5px solid #c59b3d;
+      border-top: 0.5px solid #c59b3d;
+      opacity: 0.6;
+    }
+
+    /* API Info Section */
+    .api-info {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 30px;
+      margin-top: 60px;
+    }
+
+    .api-info h2 {
+      color: #c59b3d;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .api-info pre {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .api-info code {
+      color: #f5f3ef;
+    }
+
+    .api-info .param {
+      color: #c59b3d;
+    }
+
+    .api-info .string {
+      color: #98c379;
+    }
+
+    .api-info .comment {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quote Post Templates</h1>
+  <p class="subtitle">Independent endpoint: /api/quote</p>
+
+  <!-- Instagram/Threads Templates -->
+  <h2 class="section-title">Instagram / Threads (1080 x 1350)</h2>
+  <div class="preview-grid">
+    <!-- Green Theme -->
+    <div class="preview-card">
+      <h3>Green Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview instagram green">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White Theme -->
+    <div class="preview-card">
+      <h3>White Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview instagram white">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Black Theme -->
+    <div class="preview-card">
+      <h3>Black Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview instagram black">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LinkedIn Templates -->
+  <h2 class="section-title">LinkedIn (1200 x 1200)</h2>
+  <div class="preview-grid">
+    <!-- Green Theme -->
+    <div class="preview-card">
+      <h3>Green Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview linkedin green">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White Theme -->
+    <div class="preview-card">
+      <h3>White Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview linkedin white">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Black Theme -->
+    <div class="preview-card">
+      <h3>Black Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview linkedin black">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+          <div class="chevron-down">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle">
+            <div class="corner-bl"></div>
+            <span class="handle-text">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facebook Templates -->
+  <h2 class="section-title">Facebook (1200 x 630)</h2>
+  <div class="preview-grid">
+    <!-- Green Theme -->
+    <div class="preview-card">
+      <h3>Green Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview facebook green">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+          <div class="chevron-down" style="bottom: 20px;">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle" style="bottom: 8px; left: 8px;">
+            <div class="corner-bl"></div>
+            <span class="handle-text" style="font-size: 5px;">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White Theme -->
+    <div class="preview-card">
+      <h3>White Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview facebook white">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+          <div class="chevron-down" style="bottom: 20px;">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle" style="bottom: 8px; left: 8px;">
+            <div class="corner-bl"></div>
+            <span class="handle-text" style="font-size: 5px;">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Black Theme -->
+    <div class="preview-card">
+      <h3>Black Theme</h3>
+      <div class="preview-container">
+        <div class="quote-preview facebook black">
+          <div class="gold-line-top"></div>
+          <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+          <div class="chevron-down" style="bottom: 20px;">
+            <svg viewBox="0 0 12 6">
+              <path d="M 0.5 0.5 L 6 5.5 L 11.5 0.5" />
+            </svg>
+          </div>
+          <div class="handle" style="bottom: 8px; left: 8px;">
+            <div class="corner-bl"></div>
+            <span class="handle-text" style="font-size: 5px;">BASTIANGUGGER</span>
+            <div class="corner-tr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Documentation -->
+  <div class="api-info">
+    <h2>API Usage</h2>
+    <pre><code><span class="comment">// Endpoint (independent from carousel generator)</span>
+POST https://carousel-image-generator.vercel.app/api/quote
+
+<span class="comment">// Request Body</span>
+{
+  <span class="param">"theme"</span>: <span class="string">"green"</span>,     <span class="comment">// "green" | "white" | "black"</span>
+  <span class="param">"platform"</span>: <span class="string">"instagram"</span>, <span class="comment">// "instagram" | "linkedin" | "facebook" | "threads"</span>
+  <span class="param">"data"</span>: {
+    <span class="param">"text"</span>: <span class="string">"Your quote goes here"</span>
+  }
+}
+
+<span class="comment">// Response: PNG image</span>
+
+<span class="comment">// Example with curl:</span>
+curl -X POST https://carousel-image-generator.vercel.app/api/quote \
+  -H "Content-Type: application/json" \
+  -d '{"theme":"green","platform":"instagram","data":{"text":"Hypervigilance is not paranoia. It is memory."}}' \
+  --output quote.png
+</code></pre>
+  </div>
+
+  <!-- Dimensions Reference -->
+  <div class="api-info" style="margin-top: 30px;">
+    <h2>Platform Dimensions</h2>
+    <pre><code><span class="comment">// Output dimensions per platform</span>
+
+<span class="param">instagram</span>: 1080 x 1350 (4:5 portrait)
+<span class="param">threads</span>:   1080 x 1350 (4:5 portrait)
+<span class="param">linkedin</span>:  1200 x 1200 (1:1 square)
+<span class="param">facebook</span>:  1200 x 630  (1.91:1 landscape)
+</code></pre>
+  </div>
+</body>
+</html>

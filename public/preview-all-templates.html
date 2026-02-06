@@ -1,0 +1,1329 @@
+<html><head>
+  <meta charset="UTF-8">
+  <title>Signal Architect Templates - All Themes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
+
+    :root {
+      --green-bg: #0c1f1a;
+      --gold: #c59b3d;
+      --cream: #f5f3ef;
+      --calligraphy: #ede5d8;
+      --black: #0a1315;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0a;
+      padding: 40px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    h1 {
+      color: var(--cream);
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 400;
+      font-size: 48px;
+      font-style: italic;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 16px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .section-title {
+      color: var(--gold);
+      text-align: center;
+      margin: 60px 0 30px 0;
+      font-size: 14px;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .carousel-row {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-start;
+      margin-bottom: 40px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 20px 0;
+    }
+
+    .slide-wrapper {
+      flex-shrink: 0;
+    }
+
+    .slide-label {
+      color: var(--cream);
+      opacity: 0.5;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Slide at 20% scale: 1080x1350 → 216x270 */
+    .slide {
+      width: 216px;
+      height: 270px;
+      position: relative;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    /* ========== THEME: ROYAL GREEN ========== */
+    .slide.theme-green {
+      background: var(--green-bg);
+      color: var(--cream);
+    }
+    .slide.theme-green .slide-number {
+      border-color: rgba(245, 243, 239, 0.25);
+    }
+
+    /* ========== THEME: BROKEN WHITE ========== */
+    .slide.theme-white {
+      background: var(--calligraphy);
+      color: var(--green-bg);
+    }
+    .slide.theme-white .hook-headline {
+      color: var(--green-bg);
+    }
+    .slide.theme-white .slide-number {
+      border-color: rgba(12, 31, 26, 0.25);
+    }
+
+    /* ========== THEME: BROKEN BLACK ========== */
+    .slide.theme-black {
+      background: var(--black);
+      color: var(--cream);
+    }
+    .slide.theme-black .slide-number {
+      border-color: rgba(245, 243, 239, 0.25);
+    }
+
+    /* ========== TOP CENTER GOLDEN LINE (Hook only) ========== */
+    .gold-line-top {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 24px;
+      background: linear-gradient(180deg, var(--gold) 0%, var(--gold) 60%, transparent 100%);
+      opacity: 0.8;
+    }
+
+    /* ========== BOTTOM CENTER GOLDEN LINE (CTA only) ========== */
+    .gold-line-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 24px;
+      background: linear-gradient(0deg, var(--gold) 0%, var(--gold) 60%, transparent 100%);
+      opacity: 0.8;
+    }
+
+    /* ========== CONNECTING LINE BETWEEN SLIDES ========== */
+    .connect-line-right {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 100%);
+      opacity: 0.6;
+    }
+
+    .connect-line-left {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+      opacity: 0.6;
+    }
+
+    /* ========== HANDLE WITH VERY TIGHT CORNERS ========== */
+    .handle-container {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+    }
+
+    .handle-text {
+      font-size: 6px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.55;
+      position: relative;
+      display: inline-block;
+      padding: 1px 2px;
+    }
+
+    .corner-bl {
+      position: absolute;
+      bottom: 0px;
+      left: -1px;
+      width: 3px;
+      height: 3px;
+      border-left: 1px solid var(--gold);
+      border-bottom: 1px solid var(--gold);
+      opacity: 0.4;
+    }
+
+    .corner-tr {
+      position: absolute;
+      top: 0px;
+      right: -1px;
+      width: 3px;
+      height: 3px;
+      border-right: 1px solid var(--gold);
+      border-top: 1px solid var(--gold);
+      opacity: 0.4;
+    }
+
+    /* ========== SWIPE INDICATOR ========== */
+    .swipe {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      font-size: 6px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.55;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .swipe-arrow {
+      display: inline-block;
+      width: 11px;
+      height: 1px;
+      background: currentColor;
+      position: relative;
+    }
+
+    .swipe-arrow::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: -2px;
+      width: 3px;
+      height: 3px;
+      border-right: 1px solid currentColor;
+      border-top: 1px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    /* ========== SLIDE NUMBER ========== */
+    .slide-number {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 21px;
+      height: 21px;
+      border: 1px solid;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 400;
+      padding-bottom: 1px;
+    }
+
+    /* ========== EMPTY CONTENT AREA INDICATOR ========== */
+    .content-area {
+      position: absolute;
+      top: 40px;
+      left: 18px;
+      right: 18px;
+      bottom: 45px;
+      border: 1px dashed rgba(197, 155, 61, 0.2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.25;
+    }
+
+    /* ========== EXAMPLE CONTENT STYLES ========== */
+    .hook-content {
+      position: absolute;
+      top: 35px;
+      left: 16px;
+      right: 16px;
+      bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .hook-headline {
+      font-size: 20px;
+      font-weight: 500;
+      font-style: italic;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      font-style: italic;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .hook-subtitle {
+      font-size: 10px;
+      opacity: 0.65;
+      font-style: italic;
+    }
+
+    .body-content {
+      position: absolute;
+      top: 38px;
+      left: 14px;
+      right: 14px;
+      bottom: 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: left;
+    }
+
+    .body-headline {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .body-text {
+      font-size: 10px;
+      line-height: 1.5;
+      opacity: 0.92;
+    }
+
+    .body-text p {
+      margin-bottom: 6px;
+    }
+
+    .cta-content {
+      position: absolute;
+      top: 35px;
+      left: 14px;
+      right: 14px;
+      bottom: 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .cta-headline {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .cta-action {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin: 8px 0;
+      color: var(--gold);
+    }
+
+    .cta-text {
+      font-size: 9px;
+      line-height: 1.4;
+      opacity: 0.8;
+    }
+
+    .example-row {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin-bottom: 50px;
+      padding: 20px 0;
+    }
+
+    /* Larger slides for examples */
+    .example-row .slide {
+      width: 380px;
+      height: 475px;
+      border-radius: 14px;
+    }
+
+    .example-row .gold-line-top,
+    .example-row .gold-line-bottom {
+      height: 42px;
+    }
+
+    .example-row .handle-container {
+      bottom: 25px;
+      left: 25px;
+    }
+
+    .example-row .handle-text {
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 2px 3px;
+    }
+
+    .example-row .corner-bl,
+    .example-row .corner-tr {
+      width: 5px;
+      height: 5px;
+    }
+
+    .example-row .swipe {
+      bottom: 25px;
+      right: 25px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      gap: 6px;
+    }
+
+    .example-row .swipe-arrow {
+      width: 18px;
+    }
+
+    .example-row .swipe-arrow::after {
+      width: 5px;
+      height: 5px;
+      top: -2px;
+    }
+
+    .example-row .slide-number {
+      top: 20px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      font-size: 15px;
+      padding-bottom: 2px;
+    }
+
+    .example-row .connect-line-right {
+      width: 40px;
+      height: 1px;
+    }
+
+    .example-row .connect-line-left {
+      width: 25px;
+      height: 1px;
+    }
+
+    .example-row .hook-content {
+      top: 60px;
+      left: 28px;
+      right: 28px;
+      bottom: 85px;
+    }
+
+    .example-row .hook-headline {
+      font-size: 35px;
+      margin-bottom: 16px;
+    }
+
+    .example-row .hook-subtitle {
+      font-size: 17px;
+    }
+
+    .example-row .body-content {
+      top: 65px;
+      left: 25px;
+      right: 25px;
+      bottom: 75px;
+    }
+
+    .example-row .body-headline {
+      font-size: 21px;
+      margin-bottom: 14px;
+    }
+
+    .example-row .body-text {
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .example-row .body-text p {
+      margin-bottom: 10px;
+    }
+
+    .example-row .cta-content {
+      top: 60px;
+      left: 25px;
+      right: 25px;
+      bottom: 75px;
+    }
+
+    .example-row .cta-headline {
+      font-size: 19px;
+      margin-bottom: 20px;
+    }
+
+    .example-row .cta-action {
+      font-size: 22px;
+      letter-spacing: 4px;
+      margin: 14px 0;
+    }
+
+    .example-row .cta-text {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      border-top: 1px solid rgba(197, 155, 61, 0.15);
+      margin: 80px 0 60px 0;
+    }
+
+    /* ========== REEL THUMBNAILS ========== */
+    .reel-thumbnail {
+      width: 162px;
+      height: 288px;
+      position: relative;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    .reel-thumbnail .background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=700&fit=crop') center/cover;
+      filter: blur(3px);
+    }
+
+    .reel-thumbnail.overlay-dark .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);
+    }
+
+    .reel-thumbnail.overlay-green .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(12,31,26,0.85) 0%, rgba(12,31,26,0.6) 30%, rgba(12,31,26,0.6) 70%, rgba(12,31,26,0.85) 100%);
+    }
+
+    .reel-thumbnail .gold-line-top {
+      height: 20px;
+    }
+
+    .reel-thumbnail .gold-line-bottom {
+      height: 20px;
+    }
+
+    .reel-thumbnail .hook-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .reel-thumbnail .hook-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.3;
+      color: var(--cream);
+      margin: 0;
+    }
+
+    .reel-example-row {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin: 40px 0 60px 0;
+      flex-wrap: wrap;
+    }
+
+    .reel-example-row .reel-thumbnail {
+      width: 270px;
+      height: 480px;
+      border-radius: 14px;
+    }
+
+    .reel-example-row .reel-thumbnail .background-image {
+      filter: blur(5px);
+    }
+
+    .reel-example-row .reel-thumbnail .gold-line-top,
+    .reel-example-row .reel-thumbnail .gold-line-bottom {
+      height: 35px;
+    }
+
+    .reel-example-row .reel-thumbnail .hook-text h1 {
+      font-size: 30px;
+    }
+
+    /* ========== QUOTE POST TEMPLATES ========== */
+    .quote-slide {
+      position: relative;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Instagram/Threads: 1080x1350 at 20% = 216x270 */
+    .quote-slide.size-instagram {
+      width: 216px;
+      height: 270px;
+    }
+
+    /* LinkedIn: 1200x1200 at 20% = 240x240 */
+    .quote-slide.size-linkedin {
+      width: 240px;
+      height: 240px;
+    }
+
+    /* Facebook: 1200x630 at 20% = 240x126 */
+    .quote-slide.size-facebook {
+      width: 240px;
+      height: 126px;
+    }
+
+    .quote-slide .quote-text {
+      font-size: 18px;
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.35;
+      text-align: center;
+      padding: 0 20px;
+      margin-top: -15px;
+    }
+
+    .quote-slide.size-facebook .quote-text {
+      font-size: 12px;
+      margin-top: 0;
+    }
+
+    .quote-slide.size-linkedin .quote-text {
+      font-size: 16px;
+    }
+
+    /* Chevron pointing down */
+    .chevron-down {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 8px;
+    }
+
+    .quote-slide.size-facebook .chevron-down {
+      bottom: 22px;
+      width: 10px;
+      height: 6px;
+    }
+
+    .chevron-down::before,
+    .chevron-down::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 8px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.4;
+    }
+
+    .chevron-down::before {
+      left: 0;
+      transform: rotate(45deg);
+      transform-origin: left center;
+    }
+
+    .chevron-down::after {
+      right: 0;
+      transform: rotate(-45deg);
+      transform-origin: right center;
+    }
+
+    /* Quote example row - larger versions */
+    .quote-example-row {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin: 40px 0 50px 0;
+      flex-wrap: wrap;
+    }
+
+    .quote-example-row .quote-slide.size-instagram {
+      width: 320px;
+      height: 400px;
+    }
+
+    .quote-example-row .quote-slide.size-linkedin {
+      width: 350px;
+      height: 350px;
+    }
+
+    .quote-example-row .quote-slide.size-facebook {
+      width: 380px;
+      height: 200px;
+    }
+
+    .quote-example-row .quote-slide .quote-text {
+      font-size: 28px;
+      padding: 0 30px;
+    }
+
+    .quote-example-row .quote-slide.size-facebook .quote-text {
+      font-size: 20px;
+    }
+
+    .quote-example-row .quote-slide.size-linkedin .quote-text {
+      font-size: 26px;
+    }
+
+    .quote-example-row .quote-slide .gold-line-top {
+      height: 35px;
+    }
+
+    .quote-example-row .quote-slide .chevron-down {
+      bottom: 60px;
+      width: 20px;
+      height: 12px;
+    }
+
+    .quote-example-row .quote-slide.size-facebook .chevron-down {
+      bottom: 35px;
+    }
+
+    .quote-example-row .quote-slide .chevron-down::before,
+    .quote-example-row .quote-slide .chevron-down::after {
+      width: 12px;
+    }
+
+    .quote-example-row .quote-slide .handle-container {
+      bottom: 20px;
+      left: 20px;
+    }
+
+    .quote-example-row .quote-slide .handle-text {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+    }
+
+    .quote-example-row .quote-slide .corner-bl,
+    .quote-example-row .quote-slide .corner-tr {
+      width: 4px;
+      height: 4px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Carousel Templates</h1>
+  <div class="subtitle">E X A M P L E S  &amp;  S P E C S</div>
+
+  <!-- ==================== DESIGN SPECS ==================== -->
+  <div class="section-title">D E S I G N  S P E C I F I C A T I O N S</div>
+
+  <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+
+    <!-- FONT SPEC -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 35px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px;">Typography</div>
+      <div style="color: var(--cream); font-size: 24px; font-style: italic; margin-bottom: 8px;">Cormorant Garamond</div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 11px;">Google Fonts • Weights: 400, 500, 600, 700</div>
+    </div>
+
+    <!-- DIMENSIONS -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 35px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px;">Dimensions</div>
+      <div style="color: var(--cream); font-size: 24px; margin-bottom: 8px;">1080 × 1350</div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 11px;">Instagram 4:5 Ratio</div>
+    </div>
+
+    <!-- GOLD ACCENT -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 35px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px;">Gold Accent</div>
+      <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
+        <div style="width: 30px; height: 30px; background: #c59b3d; border-radius: 4px;"></div>
+        <div style="color: var(--cream); font-size: 18px; font-family: monospace;">#c59b3d</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COLOR THEMES -->
+  <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 80px; flex-wrap: wrap;">
+
+    <!-- ROYAL GREEN -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 200px;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Royal Green</div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="width: 24px; height: 24px; background: #0c1f1a; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);"></div>
+        <div style="color: var(--cream); font-size: 12px;">Background</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#0c1f1a</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 24px; height: 24px; background: #f5f3ef; border-radius: 4px;"></div>
+        <div style="color: var(--cream); font-size: 12px;">Text</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#f5f3ef</div>
+      </div>
+    </div>
+
+    <!-- BROKEN WHITE -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 200px;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Broken White</div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="width: 24px; height: 24px; background: #ede5d8; border-radius: 4px;"></div>
+        <div style="color: var(--cream); font-size: 12px;">Background</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#ede5d8</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 24px; height: 24px; background: #0c1f1a; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);"></div>
+        <div style="color: var(--cream); font-size: 12px;">Text</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#0c1f1a</div>
+      </div>
+    </div>
+
+    <!-- BROKEN BLACK -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 200px;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Broken Black</div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="width: 24px; height: 24px; background: #0a1315; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);"></div>
+        <div style="color: var(--cream); font-size: 12px;">Background</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#0a1315</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 24px; height: 24px; background: #f5f3ef; border-radius: 4px;"></div>
+        <div style="color: var(--cream); font-size: 12px;">Text</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">#f5f3ef</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== EXAMPLE CAROUSELS ==================== -->
+  <div class="section-title">E X A M P L E  C A R O U S E L S</div>
+
+  <div class="example-row">
+    <!-- GREEN EXAMPLE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green — Hook</div>
+      <div class="slide theme-green">
+        <div class="gold-line-top"></div>
+        <div class="connect-line-right"></div>
+        <div class="hook-content">
+          <h1 class="hook-headline">You keep saying there are no good <span class="highlight">men</span> left</h1>
+          <p class="hook-subtitle">(read on if that's you)</p>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">Body Slide</div>
+      <div class="slide theme-green">
+        <div class="slide-number">2</div>
+        <div class="connect-line-left"></div>
+        <div class="connect-line-right"></div>
+        <div class="body-content">
+          <h2 class="body-headline">You are not dating men...</h2>
+          <div class="body-text">
+            <p>...You are dating your beliefs about them.</p>
+            <p>The ones shaped by heartbreak. By disappointment.</p>
+          </div>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">CTA Slide</div>
+      <div class="slide theme-green">
+        <div class="connect-line-left"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="cta-content">
+          <h2 class="cta-headline">Ready to flip the script?</h2>
+          <div class="cta-action">DM "QUIZ"</div>
+          <div class="cta-text">
+            <p>Let's start a conversation about reclaiming trust.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="example-row">
+    <!-- WHITE EXAMPLE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">White — Hook</div>
+      <div class="slide theme-white">
+        <div class="gold-line-top"></div>
+        <div class="connect-line-right"></div>
+        <div class="hook-content">
+          <h1 class="hook-headline">You keep saying there are no good <span class="highlight">men</span> left</h1>
+          <p class="hook-subtitle">(read on if that's you)</p>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">Body Slide</div>
+      <div class="slide theme-white">
+        <div class="slide-number">2</div>
+        <div class="connect-line-left"></div>
+        <div class="connect-line-right"></div>
+        <div class="body-content">
+          <h2 class="body-headline">You are not dating men...</h2>
+          <div class="body-text">
+            <p>...You are dating your beliefs about them.</p>
+            <p>The ones shaped by heartbreak. By disappointment.</p>
+          </div>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">CTA Slide</div>
+      <div class="slide theme-white">
+        <div class="connect-line-left"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="cta-content">
+          <h2 class="cta-headline">Ready to flip the script?</h2>
+          <div class="cta-action">DM "QUIZ"</div>
+          <div class="cta-text">
+            <p>Let's start a conversation about reclaiming trust.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="example-row">
+    <!-- BLACK EXAMPLE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Black — Hook</div>
+      <div class="slide theme-black">
+        <div class="gold-line-top"></div>
+        <div class="connect-line-right"></div>
+        <div class="hook-content">
+          <h1 class="hook-headline">You keep saying there are no good <span class="highlight">men</span> left</h1>
+          <p class="hook-subtitle">(read on if that's you)</p>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">Body Slide</div>
+      <div class="slide theme-black">
+        <div class="slide-number">2</div>
+        <div class="connect-line-left"></div>
+        <div class="connect-line-right"></div>
+        <div class="body-content">
+          <h2 class="body-headline">You are not dating men...</h2>
+          <div class="body-text">
+            <p>...You are dating your beliefs about them.</p>
+            <p>The ones shaped by heartbreak. By disappointment.</p>
+          </div>
+        </div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <div class="slide-wrapper">
+      <div class="slide-label">CTA Slide</div>
+      <div class="slide theme-black">
+        <div class="connect-line-left"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="cta-content">
+          <h2 class="cta-headline">Ready to flip the script?</h2>
+          <div class="cta-action">DM "QUIZ"</div>
+          <div class="cta-text">
+            <p>Let's start a conversation about reclaiming trust.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ==================== REEL THUMBNAILS SECTION ==================== -->
+  <h1 style="font-size: 36px;">Reel Thumbnail Templates</h1>
+  <div class="subtitle">9 : 1 6  R A T I O  •  1 0 8 0 × 1 9 2 0</div>
+
+  <!-- OVERLAY OPTIONS -->
+  <div class="section-title">O V E R L A Y  O P T I O N S</div>
+
+  <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap;">
+    <!-- DARK OVERLAY -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 200px;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Dark Overlay</div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="width: 24px; height: 24px; background: #000000; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);"></div>
+        <div style="color: var(--cream); font-size: 12px;">RGB</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">0, 0, 0</div>
+      </div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 10px; text-align: center;">Pure black gradient</div>
+    </div>
+
+    <!-- GREEN OVERLAY -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 200px;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Green Overlay</div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="width: 24px; height: 24px; background: #0c1f1a; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);"></div>
+        <div style="color: var(--cream); font-size: 12px;">RGB</div>
+        <div style="color: var(--cream); opacity: 0.6; font-size: 11px; font-family: monospace; margin-left: auto;">12, 31, 26</div>
+      </div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 10px; text-align: center;">Royal dark green gradient</div>
+    </div>
+  </div>
+
+  <!-- EXAMPLE THUMBNAILS -->
+  <div class="section-title">E X A M P L E  T H U M B N A I L S</div>
+
+  <div class="reel-example-row">
+    <!-- DARK OVERLAY EXAMPLE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Dark Overlay</div>
+      <div class="reel-thumbnail overlay-dark">
+        <div class="background-image"></div>
+        <div class="overlay"></div>
+        <div class="gold-line-top"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="hook-text">
+          <h1>The reason you keep attracting <span class="highlight">unavailable</span> people</h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- GREEN OVERLAY EXAMPLE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green Overlay</div>
+      <div class="reel-thumbnail overlay-green">
+        <div class="background-image"></div>
+        <div class="overlay"></div>
+        <div class="gold-line-top"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="hook-text">
+          <h1>The reason you keep attracting <span class="highlight">unavailable</span> people</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ==================== QUOTE POST TEMPLATES SECTION ==================== -->
+  <h1 style="font-size: 36px;">Quote Post Templates</h1>
+  <div class="subtitle">L I G H T  C O N T E N T  •  / A P I / Q U O T E</div>
+
+  <!-- PLATFORM DIMENSIONS -->
+  <div class="section-title">P L A T F O R M  D I M E N S I O N S</div>
+
+  <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+    <!-- Instagram/Threads -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 180px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Instagram / Threads</div>
+      <div style="color: var(--cream); font-size: 20px; margin-bottom: 5px;">1080 × 1350</div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 11px;">4:5 Portrait</div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 180px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">LinkedIn</div>
+      <div style="color: var(--cream); font-size: 20px; margin-bottom: 5px;">1200 × 1200</div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 11px;">1:1 Square</div>
+    </div>
+
+    <!-- Facebook -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 180px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Facebook</div>
+      <div style="color: var(--cream); font-size: 20px; margin-bottom: 5px;">1200 × 630</div>
+      <div style="color: var(--cream); opacity: 0.5; font-size: 11px;">1.91:1 Landscape</div>
+    </div>
+  </div>
+
+  <!-- INSTAGRAM/THREADS EXAMPLES -->
+  <div class="section-title">I N S T A G R A M  /  T H R E A D S</div>
+
+  <div class="quote-example-row">
+    <!-- GREEN -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green Theme</div>
+      <div class="quote-slide size-instagram theme-green">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHITE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">White Theme</div>
+      <div class="quote-slide size-instagram theme-white">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACK -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Black Theme</div>
+      <div class="quote-slide size-instagram theme-black">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Hypervigilance isn't paranoia. It's memory.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINKEDIN EXAMPLES -->
+  <div class="section-title">L I N K E D I N</div>
+
+  <div class="quote-example-row">
+    <!-- GREEN -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green Theme</div>
+      <div class="quote-slide size-linkedin theme-green">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHITE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">White Theme</div>
+      <div class="quote-slide size-linkedin theme-white">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACK -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Black Theme</div>
+      <div class="quote-slide size-linkedin theme-black">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The people who need the most validation rarely ask for it.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FACEBOOK EXAMPLES -->
+  <div class="section-title">F A C E B O O K</div>
+
+  <div class="quote-example-row">
+    <!-- GREEN -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green Theme</div>
+      <div class="quote-slide size-facebook theme-green">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container" style="bottom: 12px; left: 12px;">
+          <span class="handle-text" style="font-size: 7px;">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHITE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">White Theme</div>
+      <div class="quote-slide size-facebook theme-white">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container" style="bottom: 12px; left: 12px;">
+          <span class="handle-text" style="font-size: 7px;">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACK -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Black Theme</div>
+      <div class="quote-slide size-facebook theme-black">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">Sometimes protecting your peace looks like not responding.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container" style="bottom: 12px; left: 12px;">
+          <span class="handle-text" style="font-size: 7px;">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE API SPEC -->
+  <div class="section-title">A P I  E N D P O I N T</div>
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 30px; max-width: 700px; margin: 0 auto 60px auto;">
+    <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;">POST /api/quote</div>
+    <pre style="color: var(--cream); font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; line-height: 1.8; margin: 0; white-space: pre-wrap;">
+{
+  "theme": "green",        // "green" | "white" | "black"
+  "platform": "instagram", // "instagram" | "linkedin" | "facebook" | "threads"
+  "data": {
+    "text": "Your quote goes here"
+  }
+}
+    </pre>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="text-align: center; padding: 40px 0; color: var(--cream); opacity: 0.3; font-size: 12px; letter-spacing: 2px;">
+    SIGNAL ARCHITECT • HEALING HEARTS BRAND TEMPLATES
+  </div>
+
+</body>
+</html>
