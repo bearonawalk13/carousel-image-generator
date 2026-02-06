@@ -13,7 +13,8 @@ const CONFIG = {
     instagram: { width: 1080, height: 1350 },  // 4:5 portrait
     threads: { width: 1080, height: 1350 },    // Same as Instagram
     linkedin: { width: 1200, height: 1200 },   // 1:1 square
-    facebook: { width: 1200, height: 630 }     // 1.91:1 landscape
+    facebook: { width: 1200, height: 630 },    // 1.91:1 landscape
+    substack: { width: 1456, height: 1092 }    // 4:3 landscape
   },
 
   // Same themes as carousel
@@ -238,6 +239,9 @@ function quoteSlide(data, colors, size) {
   } else if (width === 1200 && height === 1200) {
     // LinkedIn (square)
     fontSize = textLength > 100 ? 60 : textLength > 60 ? 75 : 90;
+  } else if (width === 1456 && height === 1092) {
+    // Substack (4:3 landscape)
+    fontSize = textLength > 100 ? 65 : textLength > 60 ? 80 : 95;
   } else {
     // Facebook (landscape)
     fontSize = textLength > 100 ? 50 : textLength > 60 ? 60 : 70;
