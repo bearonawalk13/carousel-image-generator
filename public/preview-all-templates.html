@@ -668,6 +668,12 @@
       height: 126px;
     }
 
+    /* Substack: 1456x1092 at 20% = 291x218 */
+    .quote-slide.size-substack {
+      width: 291px;
+      height: 218px;
+    }
+
     .quote-slide .quote-text {
       font-size: 18px;
       font-weight: 700;
@@ -689,6 +695,10 @@
 
     .quote-slide.size-linkedin .quote-text {
       font-size: 16px;
+    }
+
+    .quote-slide.size-substack .quote-text {
+      font-size: 17px;
     }
 
     /* Chevron pointing down */
@@ -1395,6 +1405,62 @@
     </div>
   </div>
 
+  <!-- SUBSTACK EXAMPLES -->
+  <div class="section-title">S U B S T A C K</div>
+
+  <div class="quote-example-row">
+    <!-- GREEN -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Green Theme</div>
+      <div class="quote-slide size-substack theme-green">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The wound is where the <span class="gold">light</span> enters you.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHITE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">White Theme</div>
+      <div class="quote-slide size-substack theme-white">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The wound is where the <span class="gold">light</span> enters you.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACK -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Black Theme</div>
+      <div class="quote-slide size-substack theme-black">
+        <div class="gold-line-top"></div>
+        <div class="quote-text">The wound is where the <span class="gold">light</span> enters you.</div>
+        <div class="chevron-down"></div>
+        <div class="handle-container">
+          <span class="handle-text">
+            <span class="corner-bl"></span>
+            BASTIANGUGGER
+            <span class="corner-tr"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- QUOTE API SPEC -->
   <div class="section-title">A P I  E N D P O I N T</div>
 
@@ -1403,7 +1469,7 @@
     <pre style="color: var(--cream); font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; line-height: 1.8; margin: 0; white-space: pre-wrap;">
 {
   "theme": "green",        // "green" | "white" | "black"
-  "platform": "instagram", // "instagram" | "linkedin" | "facebook" | "threads"
+  "platform": "instagram", // "instagram" | "linkedin" | "facebook" | "threads" | "substack"
   "data": {
     "text": "Your quote goes here"
   }
