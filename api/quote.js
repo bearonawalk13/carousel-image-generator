@@ -155,8 +155,8 @@ function handleElement(colors) {
   };
 }
 
-// Soft chevron pointing down (below quote)
-function chevronDown(colors, width) {
+// Soft chevron pointing down (below quote) - flows with text, not absolute
+function chevronDown(colors) {
   const chevronWidth = 60;
   const chevronHeight = 30;
   const strokeWidth = 2;
@@ -165,11 +165,9 @@ function chevronDown(colors, width) {
     type: 'div',
     props: {
       style: {
-        position: 'absolute',
-        bottom: 180,
-        left: (width - chevronWidth) / 2,
         width: chevronWidth,
         height: chevronHeight,
+        marginTop: 50,  // Fixed gap below text
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -189,7 +187,7 @@ function chevronDown(colors, width) {
               fill: 'none',
               strokeLinecap: 'round',
               strokeLinejoin: 'round',
-              opacity: 0.4
+              opacity: 0.6
             }
           }
         }
@@ -328,7 +326,7 @@ function quoteSlide(data, colors, size) {
         // Gold line at top
         goldLineTop(colors, width),
 
-        // Quote text container
+        // Quote text container with chevron following the text
         {
           type: 'div',
           props: {
@@ -338,15 +336,15 @@ function quoteSlide(data, colors, size) {
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              maxWidth: width - (CONFIG.padding * 2),
-              marginTop: -40  // Shift up slightly to balance with chevron
+              maxWidth: width - (CONFIG.padding * 2)
             },
-            children: quoteContent
+            children: [
+              quoteContent,
+              // Chevron below quote - fixed gap after text
+              chevronDown(colors)
+            ]
           }
         },
-
-        // Chevron below quote
-        chevronDown(colors, width),
 
         // Handle (bottom-left)
         handleElement(colors)
