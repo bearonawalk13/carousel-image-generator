@@ -142,14 +142,15 @@ function reelThumbnailSlide(data, colors, overlayColor = 'dark') {
   let hookContent;
 
   if (data.text && data.highlight) {
-    const highlightWord = data.highlight.toLowerCase();
+    const highlightWord = data.highlight.toLowerCase().replace(/[^a-z]/g, '');
     const words = data.text.split(' ');
 
     const wordElements = words.map((word, i) => {
       const wordLower = word.toLowerCase();
-      const isHighlight = wordLower === highlightWord ||
-                          wordLower.startsWith(highlightWord) ||
-                          wordLower.endsWith(highlightWord);
+      const wordClean = wordLower.replace(/[^a-z]/g, '');  // Strip non-alpha for comparison
+      const isHighlight = wordClean === highlightWord ||
+                          wordClean.startsWith(highlightWord) ||
+                          wordClean.endsWith(highlightWord);
 
       return {
         type: 'span',
