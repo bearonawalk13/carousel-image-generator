@@ -233,16 +233,16 @@ function quoteSlide(data, colors, size) {
 
   if (width === 1080 && height === 1350) {
     // Instagram/Threads (portrait)
-    fontSize = textLength > 100 ? 70 : textLength > 60 ? 85 : 100;
+    fontSize = textLength > 100 ? 70 : textLength > 60 ? 85 : textLength > 30 ? 88 : 100;
   } else if (width === 1200 && height === 1200) {
     // LinkedIn (square)
-    fontSize = textLength > 100 ? 60 : textLength > 60 ? 75 : 90;
+    fontSize = textLength > 100 ? 60 : textLength > 60 ? 75 : textLength > 30 ? 78 : 90;
   } else if (width === 1456 && height === 1092) {
     // Substack (4:3 landscape)
-    fontSize = textLength > 100 ? 65 : textLength > 60 ? 80 : 95;
+    fontSize = textLength > 100 ? 65 : textLength > 60 ? 80 : textLength > 30 ? 83 : 95;
   } else {
     // Facebook (landscape)
-    fontSize = textLength > 100 ? 50 : textLength > 60 ? 60 : 70;
+    fontSize = textLength > 100 ? 50 : textLength > 60 ? 60 : textLength > 30 ? 63 : 70;
   }
 
   // Build quote text content with optional gold highlighting
