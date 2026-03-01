@@ -628,6 +628,16 @@ function hookSlide(data, colors) {
 }
 
 function bodySlide(data, colors, slideNum) {
+  // V2.1.0: Dynamic font sizing — accept optional font_size/headline_size from caller
+  const bodyFontSize = data.font_size || CONFIG.sizes.bodyText;
+  const headFontSize = data.headline_size || CONFIG.sizes.bodyHeadline;
+
+  // V2.1.0: Safe zone — content must not overflow into handle/swipe/slide-number areas
+  // Top: slideNumberTop(60) + slideNumberSize(105) + 30px gap = 195px
+  // Bottom: handleBottom(70) + ~50px handle height + 30px gap = 150px
+  // Usable height: 1350 - 195 - 150 = 1005px
+  const safeHeight = 1005;
+
   const bodyLines = (data.body_lines || []).map(line => {
     const styledContent = parseStyledText(line, 500);
     const hasMarkup = Array.isArray(styledContent);
@@ -636,7 +646,7 @@ function bodySlide(data, colors, slideNum) {
       type: 'div',
       props: {
         style: {
-          fontSize: CONFIG.sizes.bodyText,
+          fontSize: bodyFontSize,
           fontWeight: 500,
           color: colors.text,
           marginBottom: 16,
@@ -670,7 +680,7 @@ function bodySlide(data, colors, slideNum) {
         slideNumber(slideNum, colors),
         connectLineLeft(colors),
         connectLineRight(colors),
-        // Content container
+        // Content container with safe zone enforcement
         {
           type: 'div',
           props: {
@@ -678,14 +688,16 @@ function bodySlide(data, colors, slideNum) {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              paddingRight: 60
+              paddingRight: 60,
+              maxHeight: safeHeight,
+              overflow: 'hidden'
             },
             children: [
               data.headline ? {
                 type: 'div',
                 props: {
                   style: {
-                    fontSize: CONFIG.sizes.bodyHeadline,
+                    fontSize: headFontSize,
                     fontWeight: 700,
                     color: colors.text,
                     marginBottom: CONFIG.headlineBodyGap,
