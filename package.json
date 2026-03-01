@@ -5,6 +5,7 @@
   "dependencies": {
     "satori": "^0.10.11",
     "@resvg/resvg-js": "^2.6.0",
+    "sharp": "^0.33.2",
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
     "node-fetch": "^2.7.0",

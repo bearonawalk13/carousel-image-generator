@@ -1,5 +1,6 @@
 const satori = require('satori').default;
 const { Resvg } = require('@resvg/resvg-js');
+const sharp = require('sharp');
 
 // =============================================================
 // REEL THUMBNAIL CONFIGURATION (9:16 aspect ratio)
@@ -369,7 +370,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { theme = 'dark', data, font = 'cormorant', overlay = 'dark' } = req.body;
+    const { theme = 'dark', data, font = 'cormorant', overlay = 'dark', format = 'jpeg' } = req.body;
 
     if (!data) {
       return res.status(400).json({ error: 'Missing data' });
@@ -394,9 +395,17 @@ module.exports = async function handler(req, res) {
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
 
-    res.setHeader('Content-Type', 'image/png');
+    // Convert to JPEG by default (Instagram Reels requires JPEG cover images)
+    if (format === 'png') {
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      return res.send(pngBuffer);
+    }
+
+    const jpegBuffer = await sharp(pngBuffer).jpeg({ quality: 90 }).toBuffer();
+    res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=31536000');
-    return res.send(pngBuffer);
+    return res.send(jpegBuffer);
 
   } catch (error) {
     console.error('Error generating reel thumbnail:', error);
