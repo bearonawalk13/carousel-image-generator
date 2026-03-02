@@ -282,9 +282,13 @@ Return ONLY valid JSON with this exact structure:
 4. If a post is a Winner, explain what specifically made it work so the pattern can be repeated
 5. Sequel candidate = same topic deserves a follow-up from a different angle
 6. Remix candidate = same content could work better in a different format (e.g., Reel → Carousel)
-7. Keep each reason and fix to 1-2 sentences max`;
+7. Keep each reason and fix to 1-2 sentences max
 
-async function runAIDiagnosis(asset, metrics48h, metrics7d, baselines) {
+## OUTPUT LANGUAGE
+Write all reasons, fixes, and commentary in the specified output language.
+Keep all JSON keys in English. Only values should be in the target language.`;
+
+async function runAIDiagnosis(asset, metrics48h, metrics7d, baselines, outputLanguage = 'English') {
   const apiKey = getEnv('OPENROUTER_API_KEY');
 
   const m48 = metrics48h || { reach: 0, views: 0, likes: 0, comments: 0, saves: 0, shares: 0 };
@@ -299,7 +303,9 @@ async function runAIDiagnosis(asset, metrics48h, metrics7d, baselines) {
     }
   }
 
-  const userPrompt = `## Content Context
+  const userPrompt = `## Output Language: ${outputLanguage}
+
+## Content Context
 - **Title:** ${asset.Title || 'N/A'}
 - **Asset Code:** ${asset['Asset Code'] || 'N/A'}
 - **Platform:** ${asset.Platform || 'N/A'}
@@ -406,9 +412,12 @@ Look for correlations between:
 
 Be specific and actionable. Reference actual post titles and metrics. Keep your analysis to 3-4 concise insights.
 
-Return your analysis as a plain text string (not JSON) — 3-4 bullet points, each 1-2 sentences.`;
+Return your analysis as a plain text string (not JSON) — 3-4 bullet points, each 1-2 sentences.
 
-async function runWeeklyAnalysis(weekAssets) {
+## OUTPUT LANGUAGE
+Write your analysis in the specified output language. Keep platform names and asset codes in English.`;
+
+async function runWeeklyAnalysis(weekAssets, outputLanguage = 'English') {
   const apiKey = getEnv('OPENROUTER_API_KEY');
 
   const summary = weekAssets.map(a => {
@@ -427,7 +436,7 @@ async function runWeeklyAnalysis(weekAssets) {
         model: 'anthropic/claude-sonnet-4-20250514',
         messages: [
           { role: 'system', content: WEEKLY_SYSTEM_PROMPT },
-          { role: 'user', content: `Here are this week's diagnosed posts:\n\n${summary}\n\nWhat patterns do you see? What should we do differently next week?` }
+          { role: 'user', content: `Output Language: ${outputLanguage}\n\nHere are this week's diagnosed posts:\n\n${summary}\n\nWhat patterns do you see? What should we do differently next week?` }
         ],
         temperature: 0.4,
         max_tokens: 500
@@ -473,9 +482,14 @@ Return ONLY valid JSON with this exact structure:
   "performance_intelligence": "5-8 bullet points in this exact format, designed to be injected into a content creation AI:\n\nKEEP DOING:\n- Pattern (backed by data)\n\nSTOP DOING:\n- Pattern (backed by data)\n\nTRY:\n- Experiment (why)"
 }
 
-CRITICAL: The "performance_intelligence" field gets fed directly into the content creation pipeline. It must be concise, specific, and actionable. The AI creating content will read these rules and follow them. Bad example: "Improve hooks". Good example: "Use curiosity-gap hooks (questions or surprising statements) — they get 2.5x more views than listicle hooks on Instagram."`;
+CRITICAL: The "performance_intelligence" field gets fed directly into the content creation pipeline. It must be concise, specific, and actionable. The AI creating content will read these rules and follow them. Bad example: "Improve hooks". Good example: "Use curiosity-gap hooks (questions or surprising statements) — they get 2.5x more views than listicle hooks on Instagram."
 
-async function runMonthlyAnalysis(platformAssets, platform) {
+## OUTPUT LANGUAGE
+Write ALL JSON values in the specified output language.
+Keep all JSON keys in English. Keep platform names and asset codes in English.
+The "performance_intelligence" field must also be in the target language — it will be read by AI agents operating in that language.`;
+
+async function runMonthlyAnalysis(platformAssets, platform, outputLanguage = 'English') {
   const apiKey = getEnv('OPENROUTER_API_KEY');
 
   // Build detailed post summaries for the AI
@@ -506,7 +520,8 @@ Diagnosis: ${f['Bottleneck Reasons'] || 'N/A'}`;
   const totalReach = platformAssets.reduce((s, a) => s + (a.fields['Reach (7d)'] || 0), 0);
   const avgReach = platformAssets.length > 0 ? Math.round(totalReach / platformAssets.length) : 0;
 
-  const userPrompt = `## Monthly Analysis: ${platform}
+  const userPrompt = `## Output Language: ${outputLanguage}
+## Monthly Analysis: ${platform}
 ## Period: ${previousMonth()}
 ## Posts: ${platformAssets.length} total, ${scored.length} with diagnosis
 ## Platform Averages: Score ${avgScore}, Reach ${avgReach}
@@ -628,6 +643,24 @@ module.exports = async (req, res) => {
 
   try {
     // --------------------------------------------------------
+    // 0. Read Output Language from Brand Codex
+    // --------------------------------------------------------
+    let outputLanguage = 'English';
+    try {
+      const codexForLang = await airtableQuery(CODEX_TABLE, {
+        filterByFormula: `{Active Brand}=TRUE()`,
+        maxRecords: '1',
+        'fields[]': ['Output Language']
+      });
+      if (codexForLang.length > 0 && codexForLang[0].fields['Output Language']) {
+        outputLanguage = codexForLang[0].fields['Output Language'];
+      }
+    } catch (e) {
+      console.error('Failed to read Output Language from Brand Codex:', e.message);
+    }
+    log.push(`Output Language: ${outputLanguage}`);
+
+    // --------------------------------------------------------
     // 1. Query published assets
     // --------------------------------------------------------
     const allAssets = await airtableQuery(ASSETS_TABLE, {
@@ -719,7 +752,7 @@ module.exports = async (req, res) => {
         };
 
         const baselines = computeBaselines(allAssets, f.Platform, f['Content Format']);
-        const diagnosis = await runAIDiagnosis(f, metrics48h, metrics, baselines);
+        const diagnosis = await runAIDiagnosis(f, metrics48h, metrics, baselines, outputLanguage);
 
         if (diagnosis) {
           updateFields['Overall Score'] = diagnosis.overall_score || 0;
@@ -880,7 +913,7 @@ module.exports = async (req, res) => {
 
           // AI weekly insights
           const aiInsights = thisWeekAssets.length >= 2
-            ? await runWeeklyAnalysis(thisWeekAssets)
+            ? await runWeeklyAnalysis(thisWeekAssets, outputLanguage)
             : 'Not enough diagnosed posts this week for pattern analysis.';
 
           const message = `📊 Weekly Performance Report\n\n` +
@@ -947,7 +980,7 @@ module.exports = async (req, res) => {
           }
 
           log.push(`  ${platform}: analyzing ${assets.length} posts...`);
-          const analysis = await runMonthlyAnalysis(assets, platform);
+          const analysis = await runMonthlyAnalysis(assets, platform, outputLanguage);
 
           if (analysis) {
             // Compute summary stats
@@ -1034,6 +1067,7 @@ module.exports = async (req, res) => {
       total_assets: allAssets.length,
       is_monday: dayOfWeek() === 1,
       is_first_of_month: new Date().getUTCDate() === 1,
+      output_language: outputLanguage,
       log,
       errors
     };
