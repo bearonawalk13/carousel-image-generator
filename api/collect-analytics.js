@@ -115,13 +115,8 @@ async function airtablePatch(tableId, recordId, fields) {
 async function getPostAnalytics(requestId) {
   const apiKey = getEnv('UPLOAD_POST_API_KEY');
 
-  const resp = await fetch(`${UPLOAD_POST_BASE}/api/analytics/post-analytics`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ request_id: requestId })
+  const resp = await fetch(`${UPLOAD_POST_BASE}/api/uploadposts/post-analytics/${requestId}`, {
+    headers: { 'Authorization': `Apikey ${apiKey}` }
   });
 
   if (!resp.ok) {
@@ -135,13 +130,16 @@ async function getPostAnalytics(requestId) {
 
 async function getProfileAnalytics() {
   const apiKey = getEnv('UPLOAD_POST_API_KEY');
+  const username = getEnv('UPLOAD_POST_USERNAME'); // e.g. "@bastiangugger"
 
-  const resp = await fetch(`${UPLOAD_POST_BASE}/api/analytics/analytics`, {
-    headers: { 'Authorization': `Bearer ${apiKey}` }
-  });
+  const resp = await fetch(
+    `${UPLOAD_POST_BASE}/api/analytics/${encodeURIComponent(username)}?platforms=instagram,linkedin,threads`,
+    { headers: { 'Authorization': `Apikey ${apiKey}` } }
+  );
 
   if (!resp.ok) {
-    console.error(`Profile analytics failed: ${resp.status}`);
+    const text = await resp.text();
+    console.error(`Profile analytics failed: ${resp.status} ${text.substring(0, 200)}`);
     return null;
   }
 
@@ -150,24 +148,16 @@ async function getProfileAnalytics() {
 
 async function getTotalImpressions() {
   const apiKey = getEnv('UPLOAD_POST_API_KEY');
+  const username = getEnv('UPLOAD_POST_USERNAME');
 
-  const now = new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-  const resp = await fetch(`${UPLOAD_POST_BASE}/api/analytics/total-impressions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      start_date: weekAgo.toISOString().split('T')[0],
-      end_date: now.toISOString().split('T')[0]
-    })
-  });
+  const resp = await fetch(
+    `${UPLOAD_POST_BASE}/api/uploadposts/total-impressions/${encodeURIComponent(username)}?period=last_week`,
+    { headers: { 'Authorization': `Apikey ${apiKey}` } }
+  );
 
   if (!resp.ok) {
-    console.error(`Total impressions failed: ${resp.status}`);
+    // This endpoint may not work for all accounts — not critical
+    console.error(`Total impressions failed: ${resp.status} (non-critical)`);
     return null;
   }
 
@@ -181,31 +171,31 @@ async function getTotalImpressions() {
 function extractMetrics(analyticsData) {
   if (!analyticsData) return null;
 
-  // Upload Post returns metrics per platform in results
-  // Aggregate across all platforms for this asset
+  // Post analytics returns per-platform objects with post metrics
+  // Each platform has: post metadata + live metrics + profile snapshots
   let reach = 0, views = 0, likes = 0, comments = 0, saves = 0, shares = 0;
 
-  // Handle different response formats
-  const data = analyticsData.data || analyticsData.analytics || analyticsData;
+  // The response may be { instagram: { metrics: {...} }, linkedin: {...} }
+  // or it may have a wrapper like { data: {...} }
+  const data = analyticsData.data || analyticsData;
 
-  if (data.results) {
-    // Per-platform results
-    for (const [platform, metrics] of Object.entries(data.results)) {
-      reach += metrics.reach || metrics.impressions || 0;
-      views += metrics.views || metrics.plays || metrics.video_views || 0;
-      likes += metrics.likes || metrics.reactions || 0;
-      comments += metrics.comments || metrics.replies || 0;
-      saves += metrics.saves || metrics.bookmarks || 0;
-      shares += metrics.shares || metrics.reposts || metrics.retweets || 0;
-    }
-  } else {
-    // Flat response
-    reach = data.reach || data.impressions || 0;
-    views = data.views || data.plays || data.video_views || 0;
-    likes = data.likes || data.reactions || 0;
-    comments = data.comments || data.replies || 0;
-    saves = data.saves || data.bookmarks || 0;
-    shares = data.shares || data.reposts || 0;
+  for (const [platform, entry] of Object.entries(data)) {
+    if (!entry || typeof entry !== 'object' || entry.success === false) continue;
+
+    // Try to find metrics in nested structures
+    const m = entry.metrics || entry.live_metrics || entry;
+
+    reach += m.reach || m.impressions || 0;
+    views += m.views || m.plays || m.video_views || m.impressions || 0;
+    likes += m.likes || m.reactions || 0;
+    comments += m.comments || m.replies || 0;
+    saves += m.saves || m.bookmarks || 0;
+    shares += m.shares || m.reposts || m.retweets || 0;
+  }
+
+  // If nothing was extracted, return null
+  if (reach === 0 && views === 0 && likes === 0 && comments === 0 && saves === 0 && shares === 0) {
+    return null;
   }
 
   return { reach, views, likes, comments, saves, shares };
@@ -619,7 +609,7 @@ module.exports = async (req, res) => {
       const profile = await getProfileAnalytics();
       const impressions = await getTotalImpressions();
 
-      if (profile || impressions) {
+      if (profile) {
         // Get the active Brand Codex record
         const codexRecords = await airtableQuery(CODEX_TABLE, {
           filterByFormula: `{Active Brand}=TRUE()`,
@@ -630,33 +620,36 @@ module.exports = async (req, res) => {
           const codexId = codexRecords[0].id;
           const profileFields = {};
 
-          // Extract follower counts per platform from profile data
-          if (profile) {
-            const platforms = profile.data || profile.profiles || profile;
-            if (Array.isArray(platforms)) {
-              for (const p of platforms) {
-                const name = (p.platform || p.name || '').toLowerCase();
-                const followers = p.followers || p.follower_count || 0;
-                if (name.includes('instagram')) profileFields['Followers Instagram (Current)'] = followers;
-                if (name.includes('linkedin')) profileFields['Followers LinkedIn (Current)'] = followers;
-                if (name.includes('facebook')) profileFields['Followers Facebook (Current)'] = followers;
-                if (name.includes('thread')) profileFields['Followers Threads (Current)'] = followers;
-                if (name.includes('youtube')) profileFields['Followers YouTube (Current)'] = followers;
-              }
+          // Profile response is { instagram: { followers: N, reach: N, impressions: N, ... }, linkedin: {...}, ... }
+          const platformMap = {
+            instagram: 'Instagram',
+            linkedin: 'LinkedIn',
+            facebook: 'Facebook',
+            threads: 'Threads',
+            youtube: 'YouTube'
+          };
+
+          let totalImpressions = 0;
+          let totalReach = 0;
+
+          for (const [key, label] of Object.entries(platformMap)) {
+            const data = profile[key];
+            if (data && data.success !== false && data.followers !== undefined) {
+              profileFields[`Followers ${label} (Current)`] = data.followers || 0;
+              totalImpressions += data.impressions || 0;
+              totalReach += data.reach || 0;
+              log.push(`  ${label}: ${data.followers} followers, ${data.reach || 0} reach`);
             }
           }
 
-          // Extract impressions
-          if (impressions) {
-            const data = impressions.data || impressions;
-            profileFields['Total Impressions (Current Week)'] = data.total_impressions || data.impressions || 0;
-            profileFields['Total Reach (Current Week)'] = data.total_reach || data.reach || 0;
-          }
-
+          profileFields['Total Impressions (Current Week)'] = totalImpressions;
+          profileFields['Total Reach (Current Week)'] = totalReach;
           profileFields['Profile Metrics Updated At'] = new Date().toISOString();
 
           await airtablePatch(CODEX_TABLE, codexId, profileFields);
           log.push(`Profile metrics updated on Brand Codex`);
+        } else {
+          log.push('No active Brand Codex record found');
         }
       }
     } catch (err) {
