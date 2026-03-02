@@ -1,5 +1,5 @@
 /**
- * Phase 5: Analytics Collector + AI Diagnosis + Weekly Report
+ * Phase 5: Analytics Collector + AI Diagnosis + Monthly Reports
  *
  * Vercel Cron Job — runs daily at 07:00 UTC
  *
@@ -10,6 +10,7 @@
  * 4. Run AI bottleneck diagnosis (OpenRouter/Claude) for 7d snapshots
  * 5. Update Brand Codex with profile metrics
  * 6. On Mondays: rotate snapshots + send weekly Telegram report
+ * 7. On 1st of month: per-platform monthly analysis → 05_Monthly Reports + Brand Codex Performance Intelligence
  */
 
 // ============================================================
@@ -22,6 +23,7 @@ const TELEGRAM_BASE = 'https://api.telegram.org';
 
 const ASSETS_TABLE = 'tblJAnftAWUNLpzBf';
 const CODEX_TABLE = 'tbl7653Ra6hQZ5uNG';
+const MONTHLY_TABLE = 'tbl1jFli7lkff50Rf';
 
 // ============================================================
 // HELPERS
@@ -44,6 +46,13 @@ function hoursAgo(dateStr) {
 
 function dayOfWeek() {
   return new Date().getUTCDay(); // 0=Sun, 1=Mon
+}
+
+function previousMonth() {
+  const now = new Date();
+  const y = now.getUTCMonth() === 0 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+  const m = now.getUTCMonth() === 0 ? 12 : now.getUTCMonth(); // getUTCMonth is 0-based
+  return `${y}-${String(m).padStart(2, '0')}`;
 }
 
 function pctChange(current, previous) {
@@ -104,6 +113,25 @@ async function airtablePatch(tableId, recordId, fields) {
   if (!resp.ok) {
     const text = await resp.text();
     throw new Error(`Airtable patch ${recordId} failed: ${resp.status} ${text.substring(0, 200)}`);
+  }
+  return resp.json();
+}
+
+async function airtableCreate(tableId, fields) {
+  const baseId = getEnv('AIRTABLE_BASE_ID');
+  const token = getEnv('AIRTABLE_TOKEN');
+
+  const resp = await fetch(`${AIRTABLE_BASE_URL}/${baseId}/${tableId}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fields, typecast: true })
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Airtable create failed: ${resp.status} ${text.substring(0, 200)}`);
   }
   return resp.json();
 }
@@ -412,6 +440,120 @@ async function runWeeklyAnalysis(weekAssets) {
     return data.choices?.[0]?.message?.content || 'No insights generated.';
   } catch (err) {
     return 'Weekly analysis error: ' + err.message;
+  }
+}
+
+// ============================================================
+// MONTHLY PER-PLATFORM ANALYSIS
+// ============================================================
+
+const MONTHLY_SYSTEM_PROMPT = `You are a social media performance coach. You just reviewed a full month of content for one specific platform. Your job is to tell the creator exactly what's working, what's not, and what to do next month.
+
+RULES:
+- Write like you're talking to a smart friend, not a marketing textbook. 8th grade reading level.
+- Every claim MUST reference a specific post by its Asset Code and title. No vague statements.
+- Use real numbers from the data. "A0340 got 2,400 reach vs your average of 800" is good. "Reach was above average" is bad.
+- Be honest. If something flopped, say so clearly and explain why in plain language.
+- Focus on patterns, not individual posts. One post bombing doesn't mean a pattern. Three posts with the same hook style bombing IS a pattern.
+
+You will receive a list of all diagnosed posts for this platform from the past month, including:
+- Title, hook/opening line, body excerpt, CTA, pillar, format, SSF lane
+- 48h and 7d metrics (reach, views, likes, comments, saves, shares)
+- AI diagnosis (score, bottleneck, reasons)
+
+Return ONLY valid JSON with this exact structure:
+{
+  "whats_working": "2-4 paragraphs. Start each pattern with a clear statement, then back it up with specific posts. Example: 'Curiosity-gap hooks are your best move on this platform. A0340 \"What nobody tells you about...\" hit 2,400 reach — that is 3x your average. A0355 used the same style and got 1,800. Compare that to A0312 which used a listicle hook and only got 400.'",
+  "whats_not_working": "2-4 paragraphs. Same format — name the pattern, show the posts that prove it, explain WHY it is not working in simple terms.",
+  "optimization_rules": "Write in three sections:\n\nKEEP DOING:\n- Rule 1 (backed by data)\n- Rule 2\n\nSTOP DOING:\n- Rule 1 (backed by data)\n- Rule 2\n\nTRY NEXT MONTH:\n- Experiment 1 (why it might work based on what you see)\n- Experiment 2",
+  "best_performers": "Top 3 posts. For each: Asset Code, title, score, and 1-2 sentences on what made it work. Be specific about the hook, body structure, or CTA that drove results.",
+  "underperformers": "Bottom 3 posts. For each: Asset Code, title, score, what went wrong, and exactly how to fix it. Give a rewritten hook or restructured approach — not generic advice.",
+  "content_mix": "Based on the data, what should the mix look like next month? More of which pillars? Which formats? Which CTAs? Which posting days? Be specific with numbers: 'Post 3 Authority carousels instead of 1. Drop Reels from 4 to 2 until hooks improve.'",
+  "monthly_focus": "ONE sentence. The single most important thing to focus on next month. Make it concrete and actionable. Example: 'Rewrite every Reel hook as a question instead of a statement — your question hooks get 2.5x more views.'",
+  "performance_intelligence": "5-8 bullet points in this exact format, designed to be injected into a content creation AI:\n\nKEEP DOING:\n- Pattern (backed by data)\n\nSTOP DOING:\n- Pattern (backed by data)\n\nTRY:\n- Experiment (why)"
+}
+
+CRITICAL: The "performance_intelligence" field gets fed directly into the content creation pipeline. It must be concise, specific, and actionable. The AI creating content will read these rules and follow them. Bad example: "Improve hooks". Good example: "Use curiosity-gap hooks (questions or surprising statements) — they get 2.5x more views than listicle hooks on Instagram."`;
+
+async function runMonthlyAnalysis(platformAssets, platform) {
+  const apiKey = getEnv('OPENROUTER_API_KEY');
+
+  // Build detailed post summaries for the AI
+  const postSummaries = platformAssets.map(a => {
+    const f = a.fields;
+    return `---
+Asset Code: ${f['Asset Code'] || '?'}
+Title: ${f.Title || '?'}
+Platform: ${f.Platform || '?'}
+Format: ${f['Content Format'] || '?'}
+Pillar: ${f['Content Pillar'] || '?'}
+SSF Lane: ${f['SSF Lane'] || '?'}
+CTA: ${f['CTA Final'] || 'None'}
+Hook: ${f['Opening Line'] || 'N/A'}
+Body (excerpt): ${(f.Body || '').substring(0, 500) || 'N/A'}
+Published: ${f['Published At'] || '?'}
+48h — Reach: ${f['Reach (48h)'] || 0}, Views: ${f['Views (48h)'] || 0}, Likes: ${f['Likes (48h)'] || 0}, Comments: ${f['Comments (48h)'] || 0}, Saves: ${f['Saves (48h)'] || 0}, Shares: ${f['Shares (48h)'] || 0}
+7d — Reach: ${f['Reach (7d)'] || 0}, Views: ${f['Views (7d)'] || 0}, Likes: ${f['Likes (7d)'] || 0}, Comments: ${f['Comments (7d)'] || 0}, Saves: ${f['Saves (7d)'] || 0}, Shares: ${f['Shares (7d)'] || 0}
+Score: ${f['Overall Score'] || '?'} | Bottleneck: ${f.Bottleneck || '?'} | Confidence: ${f['Bottleneck Confidence'] || '?'}
+Diagnosis: ${f['Bottleneck Reasons'] || 'N/A'}`;
+  }).join('\n');
+
+  // Compute platform averages
+  const scored = platformAssets.filter(a => a.fields['Overall Score']);
+  const avgScore = scored.length > 0
+    ? (scored.reduce((s, a) => s + (a.fields['Overall Score'] || 0), 0) / scored.length).toFixed(1)
+    : 'N/A';
+  const totalReach = platformAssets.reduce((s, a) => s + (a.fields['Reach (7d)'] || 0), 0);
+  const avgReach = platformAssets.length > 0 ? Math.round(totalReach / platformAssets.length) : 0;
+
+  const userPrompt = `## Monthly Analysis: ${platform}
+## Period: ${previousMonth()}
+## Posts: ${platformAssets.length} total, ${scored.length} with diagnosis
+## Platform Averages: Score ${avgScore}, Reach ${avgReach}
+
+Here is every post from this platform last month:
+
+${postSummaries}
+
+Analyze all of these posts together. Find the patterns. Be specific — use Asset Codes and real numbers. Write at an 8th grade level. Return ONLY the JSON object.`;
+
+  try {
+    const resp = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-sonnet-4-20250514',
+        messages: [
+          { role: 'system', content: MONTHLY_SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.4,
+        max_tokens: 4000
+      })
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      console.error(`Monthly analysis failed for ${platform}: ${resp.status} ${text.substring(0, 200)}`);
+      return null;
+    }
+
+    const data = await resp.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error(`Monthly analysis for ${platform} not valid JSON:`, content.substring(0, 300));
+      return null;
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (err) {
+    console.error(`Monthly analysis error for ${platform}:`, err.message);
+    return null;
   }
 }
 
@@ -757,6 +899,130 @@ module.exports = async (req, res) => {
     }
 
     // --------------------------------------------------------
+    // 6. 1st of month: Monthly per-platform analysis
+    // --------------------------------------------------------
+    if (new Date().getUTCDate() === 1) {
+      log.push('1st of month — running monthly per-platform analysis');
+
+      try {
+        const month = previousMonth();
+
+        // Query ALL diagnosed assets from last month (not just ones with request_id)
+        const monthAssets = await airtableQuery(ASSETS_TABLE, {
+          filterByFormula: `AND({Asset Status}="Published", {Overall Score}!=BLANK(), DATETIME_FORMAT({Published At}, 'YYYY-MM')="${month}")`,
+          'fields[]': [
+            'Title', 'Asset Code', 'Platform', 'Content Format', 'Content Pillar',
+            'SSF Lane', 'CTA Final', 'Opening Line', 'Body', 'Published At',
+            'Reach (48h)', 'Views (48h)', 'Likes (48h)', 'Comments (48h)', 'Saves (48h)', 'Shares (48h)',
+            'Reach (7d)', 'Views (7d)', 'Likes (7d)', 'Comments (7d)', 'Saves (7d)', 'Shares (7d)',
+            'Overall Score', 'Bottleneck', 'Bottleneck Confidence', 'Bottleneck Reasons'
+          ]
+        });
+
+        log.push(`  Found ${monthAssets.length} diagnosed assets for ${month}`);
+
+        // Group by platform
+        const byPlatform = {};
+        for (const a of monthAssets) {
+          const p = a.fields.Platform || 'Unknown';
+          if (!byPlatform[p]) byPlatform[p] = [];
+          byPlatform[p].push(a);
+        }
+
+        // Get Brand Codex for writing Performance Intelligence
+        const codexRecords = await airtableQuery(CODEX_TABLE, {
+          filterByFormula: `{Active Brand}=TRUE()`,
+          maxRecords: '1'
+        });
+        const codexId = codexRecords.length > 0 ? codexRecords[0].id : null;
+        const intelligenceFields = {};
+
+        // Run analysis per platform (min 3 posts to be meaningful)
+        const platforms = ['Instagram', 'LinkedIn', 'Threads', 'Facebook'];
+        for (const platform of platforms) {
+          const assets = byPlatform[platform];
+          if (!assets || assets.length < 3) {
+            log.push(`  ${platform}: ${assets ? assets.length : 0} posts — skipping (need 3+)`);
+            continue;
+          }
+
+          log.push(`  ${platform}: analyzing ${assets.length} posts...`);
+          const analysis = await runMonthlyAnalysis(assets, platform);
+
+          if (analysis) {
+            // Compute summary stats
+            const scored = assets.filter(a => a.fields['Overall Score']);
+            const avgScore = scored.length > 0
+              ? Number((scored.reduce((s, a) => s + (a.fields['Overall Score'] || 0), 0) / scored.length).toFixed(1))
+              : 0;
+            const totalReach = assets.reduce((s, a) => s + (a.fields['Reach (7d)'] || 0), 0);
+            const avgSaves = scored.length > 0
+              ? Number((scored.reduce((s, a) => s + (a.fields['Saves (7d)'] || 0), 0) / scored.length).toFixed(1))
+              : 0;
+
+            // Write to Monthly Reports table
+            await airtableCreate(MONTHLY_TABLE, {
+              'Month': month,
+              'Platform': { name: platform },
+              'Posts Analyzed': assets.length,
+              'Avg Overall Score': avgScore,
+              'Avg Reach': Math.round(totalReach / assets.length),
+              'Avg Saves': avgSaves,
+              'Total Reach': totalReach,
+              'What\'s Working': analysis.whats_working || '',
+              'What\'s Not Working': analysis.whats_not_working || '',
+              'Optimization Rules': analysis.optimization_rules || '',
+              'Best Performers': analysis.best_performers || '',
+              'Underperformers': analysis.underperformers || '',
+              'Content Mix Recommendation': analysis.content_mix || '',
+              'Monthly Optimization Focus': analysis.monthly_focus || '',
+              'Report Generated At': new Date().toISOString()
+            });
+
+            log.push(`  ${platform}: monthly report saved to Airtable`);
+
+            // Store Performance Intelligence for pipeline feedback
+            if (analysis.performance_intelligence) {
+              intelligenceFields[`Performance Intelligence (${platform})`] =
+                `${platform.toUpperCase()} — ${month}\n\n${analysis.performance_intelligence}`;
+            }
+          } else {
+            errors.push(`Monthly analysis failed for ${platform}`);
+          }
+
+          await sleep(1000); // Rate limit between AI calls
+        }
+
+        // Write Performance Intelligence to Brand Codex
+        if (codexId && Object.keys(intelligenceFields).length > 0) {
+          intelligenceFields['Performance Intelligence Updated At'] = new Date().toISOString();
+          await airtablePatch(CODEX_TABLE, codexId, intelligenceFields);
+          log.push(`Performance Intelligence updated on Brand Codex (${Object.keys(intelligenceFields).length - 1} platforms)`);
+        }
+
+        // Send monthly Telegram summary
+        let monthMsg = `📊 Monthly Performance Report — ${month}\n\n`;
+        for (const platform of platforms) {
+          const assets = byPlatform[platform];
+          if (!assets || assets.length < 3) continue;
+          const scored = assets.filter(a => a.fields['Overall Score']);
+          const avgScore = scored.length > 0
+            ? (scored.reduce((s, a) => s + (a.fields['Overall Score'] || 0), 0) / scored.length).toFixed(0)
+            : '?';
+          const totalReach = assets.reduce((s, a) => s + (a.fields['Reach (7d)'] || 0), 0);
+          monthMsg += `${platform}: ${assets.length} posts, avg score ${avgScore}, total reach ${totalReach.toLocaleString()}\n`;
+        }
+        monthMsg += `\nFull per-platform analysis saved to 05_Monthly Reports in Airtable.`;
+        monthMsg += `\nPerformance Intelligence updated — Content Pipeline will use these insights.`;
+        await sendTelegram(monthMsg);
+        log.push('Monthly Telegram summary sent');
+
+      } catch (err) {
+        errors.push(`Monthly analysis: ${err.message}`);
+      }
+    }
+
+    // --------------------------------------------------------
     // Done
     // --------------------------------------------------------
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -767,6 +1033,7 @@ module.exports = async (req, res) => {
       collected_7d: needs7d.length,
       total_assets: allAssets.length,
       is_monday: dayOfWeek() === 1,
+      is_first_of_month: new Date().getUTCDate() === 1,
       log,
       errors
     };
