@@ -24,6 +24,7 @@ const TELEGRAM_BASE = 'https://api.telegram.org';
 const ASSETS_TABLE = 'tblJAnftAWUNLpzBf';
 const CODEX_TABLE = 'tbl7653Ra6hQZ5uNG';
 const MONTHLY_TABLE = 'tbl1jFli7lkff50Rf';
+const INSPIRATION_TABLE = 'tblha62VnMOHoKUsO';
 
 // ============================================================
 // HELPERS
@@ -633,6 +634,85 @@ function calcAverages(records) {
 }
 
 // ============================================================
+// WINNER FEEDBACK LOOP — Update Parent Inspirations
+// ============================================================
+
+async function updateInspirationPerformance(diagnosedAssets, allAssets, log, errors) {
+  // Group newly diagnosed assets by parent inspiration
+  const inspirationMap = {};
+
+  for (const asset of diagnosedAssets) {
+    const f = asset.fields;
+    const parentIds = f['Parent Inspiration'];
+    if (!parentIds || !parentIds.length) continue;
+
+    const parentId = parentIds[0];
+    if (!inspirationMap[parentId]) {
+      inspirationMap[parentId] = [];
+    }
+    inspirationMap[parentId].push(asset);
+  }
+
+  if (Object.keys(inspirationMap).length === 0) return;
+
+  // For each parent inspiration, gather ALL diagnosed assets (not just newly diagnosed)
+  for (const [inspirationId, newAssets] of Object.entries(inspirationMap)) {
+    try {
+      // Find all published assets linked to this inspiration (from allAssets, already in memory)
+      const siblingAssets = allAssets.filter(a => {
+        const parents = a.fields['Parent Inspiration'];
+        return parents && parents.includes(inspirationId) && a.fields['Overall Score'];
+      });
+
+      if (siblingAssets.length === 0) continue;
+
+      // Compute metrics
+      const winners = siblingAssets.filter(a => a.fields.Bottleneck === 'Winner');
+      const winnerCount = winners.length;
+      const bestScore = Math.max(...siblingAssets.map(a => a.fields['Overall Score'] || 0));
+      const hasSequel = siblingAssets.some(a => a.fields['Sequel Candidate']);
+      const hasRemix = siblingAssets.some(a => a.fields['Remix Candidate']);
+
+      // Determine performance status (highest applicable)
+      let status;
+      if (hasSequel && winnerCount >= 1) {
+        status = 'Sequel Ready';
+      } else if (hasRemix && winnerCount === 0) {
+        status = 'Remix Ready';
+      } else if (winnerCount >= 2) {
+        status = 'Proven Concept';
+      } else if (winnerCount >= 1) {
+        status = 'Strong Performer';
+      } else if (hasRemix) {
+        status = 'Remix Ready';
+      } else {
+        continue; // No notable performance — skip update
+      }
+
+      // Build performance notes
+      const assetSummaries = siblingAssets.map(a => {
+        const af = a.fields;
+        return `${af['Asset Code']} (${af.Platform} ${af['Content Format']}): Score ${af['Overall Score']}, ${af.Bottleneck}`;
+      }).join('\n');
+
+      const notes = `${siblingAssets.length} assets diagnosed | ${winnerCount} winner(s) | Best score: ${bestScore}\n\n${assetSummaries}`;
+
+      // Update inspiration record
+      await airtablePatch(INSPIRATION_TABLE, inspirationId, {
+        'Performance Status': { name: status },
+        'Winner Asset Count': winnerCount,
+        'Best Score': bestScore,
+        'Performance Notes': notes
+      });
+
+      log.push(`  Performance: ${inspirationId} -> ${status} (${winnerCount} winners, best ${bestScore})`);
+    } catch (err) {
+      errors.push(`Performance update failed for ${inspirationId}: ${err.message}`);
+    }
+  }
+}
+
+// ============================================================
 // MAIN HANDLER
 // ============================================================
 
@@ -671,7 +751,8 @@ module.exports = async (req, res) => {
         'Closing Prompt', 'Published At', 'Published URL', 'Upload Post Request ID',
         'Reach (48h)', 'Reach (7d)', 'Views (7d)', 'Likes (7d)', 'Comments (7d)',
         'Saves (7d)', 'Shares (7d)', 'Overall Score', 'Bottleneck',
-        'Metrics (48h) Collected At', 'Metrics (7d) Collected At'
+        'Metrics (48h) Collected At', 'Metrics (7d) Collected At',
+        'Parent Inspiration', 'Sequel Candidate', 'Remix Candidate'
       ]
     });
 
@@ -775,6 +856,17 @@ module.exports = async (req, res) => {
       }
 
       await sleep(500);
+    }
+
+    // --------------------------------------------------------
+    // 3b. Winner feedback loop — update parent inspirations
+    // --------------------------------------------------------
+    if (needs7d.length > 0) {
+      try {
+        await updateInspirationPerformance(needs7d, allAssets, log, errors);
+      } catch (err) {
+        errors.push(`Winner feedback loop: ${err.message}`);
+      }
     }
 
     // --------------------------------------------------------
