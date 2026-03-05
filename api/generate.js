@@ -1126,7 +1126,7 @@ function noteSlide(data, colors) {
         goldLineTop({ ...colors, gold: colors.gold }),
         // Gold line bottom
         goldLineBottom({ ...colors, gold: colors.gold }),
-        // White card
+        // White card — centered on photo
         {
           type: 'div',
           props: {
@@ -1134,10 +1134,9 @@ function noteSlide(data, colors) {
               position: 'relative',
               backgroundColor: cardBg,
               borderRadius: 30,
-              padding: '50px 55px',
-              margin: '0 60px',
-              maxWidth: 920,
-              width: 920,
+              padding: '45px 50px',
+              maxWidth: 750,
+              width: 750,
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               display: 'flex',
               flexDirection: 'column'
