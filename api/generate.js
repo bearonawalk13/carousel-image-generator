@@ -1105,7 +1105,7 @@ function noteSlide(data, colors) {
         width: '100%',
         height: '100%',
         backgroundColor: '#000000',
-        paddingTop: 120
+        paddingTop: 350
       },
       children: [
         // Background image — full photo, no opacity reduction
@@ -1135,9 +1135,9 @@ function noteSlide(data, colors) {
               position: 'relative',
               backgroundColor: cardBg,
               borderRadius: 30,
-              padding: '50px 55px',
-              maxWidth: 870,
-              width: 870,
+              padding: '38px 45px',
+              maxWidth: 800,
+              width: 800,
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               display: 'flex',
               flexDirection: 'column'
@@ -1150,7 +1150,7 @@ function noteSlide(data, colors) {
                   style: {
                     display: 'flex',
                     alignItems: 'center',
-                    marginBottom: 35
+                    marginBottom: 25
                   },
                   children: [
                     // Profile photo circle
@@ -1159,8 +1159,8 @@ function noteSlide(data, colors) {
                       props: {
                         src: profileUrl,
                         style: {
-                          width: 100,
-                          height: 100,
+                          width: 88,
+                          height: 88,
                           borderRadius: '50%',
                           objectFit: 'cover',
                           marginRight: 25
