@@ -479,7 +479,7 @@ function slideNumber(num, colors) {
 // =============================================================
 
 function hookSlide(data, colors) {
-  // Photo background mode: full photo, no overlay, no text — just branding
+  // Photo background mode: full photo, no overlay, no text — just branding + design elements
   if (data.background_image) {
     const align = data.align || 'center';
     const alignItemsMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
@@ -497,7 +497,7 @@ function hookSlide(data, colors) {
           backgroundColor: colors.background
         },
         children: [
-          // Background image
+          // Background image — explicit dimensions to bypass Satori padding box issue
           {
             type: 'img',
             props: {
@@ -506,12 +506,14 @@ function hookSlide(data, colors) {
                 position: 'absolute',
                 top: 0,
                 left: 0,
-                width: '100%',
-                height: '100%',
+                width: CONFIG.width,
+                height: CONFIG.height,
                 objectFit: 'cover'
               }
             }
           },
+          goldLineTop(colors),
+          connectLineRight(colors),
           handleElement(colors),
           swipeElement(colors)
         ]
@@ -726,7 +728,7 @@ function bodySlide(data, colors, slideNum) {
         padding: CONFIG.padding
       },
       children: [
-        // Photo background (if provided)
+        // Photo background (if provided) — explicit dimensions to bypass Satori padding box issue
         hasPhoto ? {
           type: 'img',
           props: {
@@ -735,13 +737,13 @@ function bodySlide(data, colors, slideNum) {
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '100%',
-              height: '100%',
+              width: CONFIG.width,
+              height: CONFIG.height,
               objectFit: 'cover'
             }
           }
         } : null,
-        // Overlay for text readability (only with photo)
+        // Soft overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -749,9 +751,9 @@ function bodySlide(data, colors, slideNum) {
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '100%',
-              height: '100%',
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+              width: CONFIG.width,
+              height: CONFIG.height,
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.55) 0%, rgba(${overlayRgb},0.35) 30%, rgba(${overlayRgb},0.35) 70%, rgba(${overlayRgb},0.55) 100%)`
             }
           }
         } : null,
@@ -863,7 +865,7 @@ function ctaSlide(data, colors) {
         textAlign: 'center'
       },
       children: [
-        // Photo background (if provided)
+        // Photo background (if provided) — explicit dimensions to bypass Satori padding box issue
         hasPhoto ? {
           type: 'img',
           props: {
@@ -872,13 +874,13 @@ function ctaSlide(data, colors) {
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '100%',
-              height: '100%',
+              width: CONFIG.width,
+              height: CONFIG.height,
               objectFit: 'cover'
             }
           }
         } : null,
-        // Overlay for text readability (only with photo)
+        // Soft overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -886,15 +888,15 @@ function ctaSlide(data, colors) {
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '100%',
-              height: '100%',
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+              width: CONFIG.width,
+              height: CONFIG.height,
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.55) 0%, rgba(${overlayRgb},0.35) 30%, rgba(${overlayRgb},0.35) 70%, rgba(${overlayRgb},0.55) 100%)`
             }
           }
         } : null,
-        // Decorative lines only on solid backgrounds
-        hasPhoto ? null : connectLineLeft(colors),
-        hasPhoto ? null : goldLineBottom(colors),
+        // Design elements (always shown, including with photo backgrounds)
+        connectLineLeft(effectiveColors),
+        goldLineBottom(effectiveColors),
         {
           type: 'div',
           props: {
