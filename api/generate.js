@@ -655,8 +655,8 @@ function hookSlide(data, colors) {
             }
           },
           handleElement(photoColors),
-          swipeElement(photoColors)
-        ]
+          !data.is_last ? swipeElement(photoColors) : null
+        ].filter(Boolean)
       }
     };
   }
@@ -803,8 +803,8 @@ function hookSlide(data, colors) {
         // Content container
         titleContent,
         handleElement(colors),
-        swipeElement(colors)
-      ]
+        !data.is_last ? swipeElement(colors) : null
+      ].filter(Boolean)
     }
   };
 }
@@ -937,7 +937,7 @@ function bodySlide(data, colors, slideNum) {
           }
         },
         handleElement(effectiveColors),
-        swipeElement(effectiveColors)
+        !data.is_last ? swipeElement(effectiveColors) : null
       ].filter(Boolean)
     }
   };
@@ -1075,17 +1075,17 @@ function noteSlide(data, colors) {
     : [data.text || ''];
 
   const textElements = textContent.map(line => {
-    const styledContent = parseStyledText(line, 400);
+    const styledContent = parseStyledText(line, 500);
     const hasMarkup = Array.isArray(styledContent);
     return {
       type: 'div',
       props: {
         style: {
-          fontSize: 42,
-          fontWeight: 400,
+          fontSize: 46,
+          fontWeight: 500,
           color: cardText,
-          lineHeight: 1.5,
-          marginBottom: 8,
+          lineHeight: 1.45,
+          marginBottom: 12,
           ...(hasMarkup ? { display: 'flex', flexWrap: 'wrap', alignItems: 'baseline' } : {})
         },
         children: styledContent
@@ -1126,7 +1126,7 @@ function noteSlide(data, colors) {
         goldLineTop({ ...colors, gold: colors.gold }),
         // Gold line bottom
         goldLineBottom({ ...colors, gold: colors.gold }),
-        // White card — centered on photo
+        // White card — centered on photo, wide like social post
         {
           type: 'div',
           props: {
@@ -1134,9 +1134,9 @@ function noteSlide(data, colors) {
               position: 'relative',
               backgroundColor: cardBg,
               borderRadius: 30,
-              padding: '45px 50px',
-              maxWidth: 750,
-              width: 750,
+              padding: '50px 55px',
+              maxWidth: 870,
+              width: 870,
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               display: 'flex',
               flexDirection: 'column'
@@ -1158,8 +1158,8 @@ function noteSlide(data, colors) {
                       props: {
                         src: profileUrl,
                         style: {
-                          width: 90,
-                          height: 90,
+                          width: 100,
+                          height: 100,
                           borderRadius: '50%',
                           objectFit: 'cover',
                           marginRight: 25
@@ -1179,8 +1179,8 @@ function noteSlide(data, colors) {
                             type: 'div',
                             props: {
                               style: {
-                                fontSize: 38,
-                                fontWeight: 600,
+                                fontSize: 40,
+                                fontWeight: 700,
                                 color: cardText,
                                 lineHeight: 1.2
                               },
@@ -1191,7 +1191,7 @@ function noteSlide(data, colors) {
                             type: 'div',
                             props: {
                               style: {
-                                fontSize: 30,
+                                fontSize: 32,
                                 fontWeight: 400,
                                 color: cardSubtext,
                                 lineHeight: 1.3
