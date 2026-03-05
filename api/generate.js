@@ -728,7 +728,7 @@ function bodySlide(data, colors, slideNum) {
         padding: CONFIG.padding
       },
       children: [
-        // Photo background (if provided) — explicit dimensions to bypass Satori padding box issue
+        // Photo background (if provided) — reduced opacity for softer presence
         hasPhoto ? {
           type: 'img',
           props: {
@@ -739,7 +739,8 @@ function bodySlide(data, colors, slideNum) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              objectFit: 'cover'
+              objectFit: 'cover',
+              opacity: 0.5
             }
           }
         } : null,
@@ -865,7 +866,7 @@ function ctaSlide(data, colors) {
         textAlign: 'center'
       },
       children: [
-        // Photo background (if provided) — explicit dimensions to bypass Satori padding box issue
+        // Photo background (if provided) — reduced opacity for softer presence
         hasPhoto ? {
           type: 'img',
           props: {
@@ -876,7 +877,8 @@ function ctaSlide(data, colors) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              objectFit: 'cover'
+              objectFit: 'cover',
+              opacity: 0.5
             }
           }
         } : null,
