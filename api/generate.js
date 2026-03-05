@@ -479,10 +479,118 @@ function slideNumber(num, colors) {
 // =============================================================
 
 function hookSlide(data, colors) {
-  // Photo background mode: full photo, no overlay, no text — just branding + design elements
+  // Photo background mode: merged hook+body content on photo
   if (data.background_image) {
-    const align = data.align || 'center';
+    const align = data.align || 'left';
     const alignItemsMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+    const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
+      : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+    // Always use light text on photo overlay
+    const photoColors = { ...colors, text: '#f5f3ef' };
+
+    // Build hook title text
+    const hookText = data.text
+      ? data.text
+      : `${data.title_line_1 || ''} ${data.title_line_2 || ''}`.trim();
+
+    // Determine sizes based on whether body content is merged
+    const hasMergedBody = data.body_headline || (data.body_lines && data.body_lines.length > 0);
+    const hookFontSize = hasMergedBody ? 80 : CONFIG.sizes.hookTitle;
+    const bodyFontSize = data.font_size || 48;
+    const headlineFontSize = data.headline_size || 56;
+
+    // Build hook title element with optional highlight
+    let hookTitleEl;
+    if (data.text && data.highlight) {
+      const highlightWord = data.highlight.toLowerCase();
+      const words = data.text.split(' ');
+      const wordElements = words.map((word, i) => {
+        const wordLower = word.toLowerCase();
+        const isHighlight = wordLower === highlightWord ||
+                            wordLower.startsWith(highlightWord) ||
+                            wordLower.endsWith(highlightWord);
+        return {
+          type: 'span',
+          props: {
+            style: {
+              color: isHighlight ? photoColors.gold : photoColors.text,
+              whiteSpace: 'pre'
+            },
+            children: i < words.length - 1 ? word + ' ' : word
+          }
+        };
+      });
+      hookTitleEl = {
+        type: 'div',
+        props: {
+          style: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            fontSize: hookFontSize,
+            fontWeight: 700,
+            fontStyle: 'italic',
+            lineHeight: CONFIG.lineHeight,
+            maxWidth: 950
+          },
+          children: wordElements
+        }
+      };
+    } else {
+      hookTitleEl = hookText ? {
+        type: 'div',
+        props: {
+          style: {
+            fontSize: hookFontSize,
+            fontWeight: 700,
+            fontStyle: 'italic',
+            color: photoColors.text,
+            lineHeight: CONFIG.lineHeight,
+            maxWidth: 950
+          },
+          children: hookText
+        }
+      } : null;
+    }
+
+    // Build merged body content (if provided)
+    const bodyContent = [];
+    if (data.body_headline) {
+      bodyContent.push({
+        type: 'div',
+        props: {
+          style: {
+            fontSize: headlineFontSize,
+            fontWeight: 700,
+            color: photoColors.text,
+            marginTop: 40,
+            marginBottom: 20,
+            lineHeight: CONFIG.lineHeight
+          },
+          children: data.body_headline
+        }
+      });
+    }
+    if (data.body_lines && data.body_lines.length > 0) {
+      data.body_lines.forEach(line => {
+        const styledContent = parseStyledText(line, 500);
+        const hasMarkup = Array.isArray(styledContent);
+        bodyContent.push({
+          type: 'div',
+          props: {
+            style: {
+              fontSize: bodyFontSize,
+              fontWeight: 500,
+              color: photoColors.text,
+              marginBottom: 12,
+              lineHeight: CONFIG.lineHeight,
+              ...(hasMarkup ? { display: 'flex', flexWrap: 'wrap', alignItems: 'baseline' } : {})
+            },
+            children: styledContent
+          }
+        });
+      });
+    }
+
     return {
       type: 'div',
       props: {
@@ -490,14 +598,15 @@ function hookSlide(data, colors) {
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: alignItemsMap[align] || 'center',
+          alignItems: alignItemsMap[align] || 'flex-start',
           justifyContent: 'center',
           width: '100%',
           height: '100%',
-          backgroundColor: colors.background
+          backgroundColor: colors.background,
+          padding: CONFIG.padding
         },
         children: [
-          // Background image — explicit dimensions to bypass Satori padding box issue
+          // Background image
           {
             type: 'img',
             props: {
@@ -508,14 +617,46 @@ function hookSlide(data, colors) {
                 left: 0,
                 width: CONFIG.width,
                 height: CONFIG.height,
-                objectFit: 'cover'
+                objectFit: 'cover',
+                opacity: 0.2
               }
             }
           },
-          goldLineTop(colors),
-          connectLineRight(colors),
-          handleElement(colors),
-          swipeElement(colors)
+          // Overlay for text readability
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: CONFIG.width,
+                height: CONFIG.height,
+                background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+              }
+            }
+          },
+          goldLineTop(photoColors),
+          connectLineRight(photoColors),
+          // Content container
+          {
+            type: 'div',
+            props: {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                paddingRight: 60,
+                maxHeight: 1050,
+                overflow: 'hidden'
+              },
+              children: [
+                hookTitleEl,
+                ...bodyContent
+              ].filter(Boolean)
+            }
+          },
+          handleElement(photoColors),
+          swipeElement(photoColors)
         ]
       }
     };
