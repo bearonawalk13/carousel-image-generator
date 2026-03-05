@@ -601,11 +601,11 @@ function hookSlide(data, colors) {
           justifyContent: 'center',
           width: '100%',
           height: '100%',
-          backgroundColor: colors.background,
+          backgroundColor: '#0a1315',
           padding: CONFIG.padding
         },
         children: [
-          // Background image
+          // Background image — subtle photo hint on black base
           {
             type: 'img',
             props: {
@@ -617,11 +617,11 @@ function hookSlide(data, colors) {
                 width: CONFIG.width,
                 height: CONFIG.height,
                 objectFit: 'cover',
-                opacity: 0.2
+                opacity: 0.25
               }
             }
           },
-          // Overlay for text readability
+          // Heavy black overlay for text readability
           {
             type: 'div',
             props: {
@@ -631,7 +631,7 @@ function hookSlide(data, colors) {
                 left: 0,
                 width: CONFIG.width,
                 height: CONFIG.height,
-                background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+                background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
               }
             }
           },
@@ -863,11 +863,11 @@ function bodySlide(data, colors, slideNum) {
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: colors.background,
+        backgroundColor: hasPhoto ? '#0a1315' : colors.background,
         padding: CONFIG.padding
       },
       children: [
-        // Photo background (if provided) — reduced opacity for softer presence
+        // Photo background (if provided) — subtle hint on black base
         hasPhoto ? {
           type: 'img',
           props: {
@@ -879,11 +879,11 @@ function bodySlide(data, colors, slideNum) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.2
+              opacity: 0.25
             }
           }
         } : null,
-        // Overlay for text readability (only with photo)
+        // Heavy black overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -893,7 +893,7 @@ function bodySlide(data, colors, slideNum) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
             }
           }
         } : null,
@@ -999,12 +999,12 @@ function ctaSlide(data, colors) {
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: colors.background,
+        backgroundColor: hasPhoto ? '#0a1315' : colors.background,
         padding: CONFIG.padding,
         textAlign: 'center'
       },
       children: [
-        // Photo background (if provided) — reduced opacity for softer presence
+        // Photo background (if provided) — subtle hint on black base
         hasPhoto ? {
           type: 'img',
           props: {
@@ -1016,11 +1016,11 @@ function ctaSlide(data, colors) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.2
+              opacity: 0.25
             }
           }
         } : null,
-        // Overlay for text readability (only with photo)
+        // Heavy black overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -1030,7 +1030,7 @@ function ctaSlide(data, colors) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
             }
           }
         } : null,
@@ -1047,6 +1047,177 @@ function ctaSlide(data, colors) {
               justifyContent: 'center'
             },
             children: lines
+          }
+        }
+      ].filter(Boolean)
+    }
+  };
+}
+
+// =============================================================
+// NOTE SLIDE (Personal Note: card on photo background)
+// =============================================================
+
+const PROFILE_PHOTO_URL = 'https://carousel-image-generator.vercel.app/profile-photo.jpg';
+const PROFILE_NAME = 'Bastian Gugger';
+const PROFILE_HANDLE = '@bastiangugger';
+
+function noteSlide(data, colors) {
+  // data: { background_image, text (string or array), is_cta (bool) }
+  const cardBg = '#ffffff';
+  const cardText = '#1a1a1a';
+  const cardSubtext = '#666666';
+  const profileUrl = data.profile_photo || PROFILE_PHOTO_URL;
+
+  // Build text lines from either string or array
+  const textContent = Array.isArray(data.text)
+    ? data.text
+    : [data.text || ''];
+
+  const textElements = textContent.map(line => {
+    const styledContent = parseStyledText(line, 400);
+    const hasMarkup = Array.isArray(styledContent);
+    return {
+      type: 'div',
+      props: {
+        style: {
+          fontSize: 42,
+          fontWeight: 400,
+          color: cardText,
+          lineHeight: 1.5,
+          marginBottom: 8,
+          ...(hasMarkup ? { display: 'flex', flexWrap: 'wrap', alignItems: 'baseline' } : {})
+        },
+        children: styledContent
+      }
+    };
+  });
+
+  return {
+    type: 'div',
+    props: {
+      style: {
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#000000'
+      },
+      children: [
+        // Background image — full photo, no opacity reduction
+        data.background_image ? {
+          type: 'img',
+          props: {
+            src: data.background_image,
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: CONFIG.width,
+              height: CONFIG.height,
+              objectFit: 'cover'
+            }
+          }
+        } : null,
+        // Gold line top
+        goldLineTop({ ...colors, gold: colors.gold }),
+        // Gold line bottom
+        goldLineBottom({ ...colors, gold: colors.gold }),
+        // White card
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'relative',
+              backgroundColor: cardBg,
+              borderRadius: 30,
+              padding: '50px 55px',
+              margin: '0 60px',
+              maxWidth: 920,
+              width: 920,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              display: 'flex',
+              flexDirection: 'column'
+            },
+            children: [
+              // Profile header: photo + name + handle
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: 35
+                  },
+                  children: [
+                    // Profile photo circle
+                    {
+                      type: 'img',
+                      props: {
+                        src: profileUrl,
+                        style: {
+                          width: 90,
+                          height: 90,
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          marginRight: 25
+                        }
+                      }
+                    },
+                    // Name + handle
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'column'
+                        },
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: 38,
+                                fontWeight: 600,
+                                color: cardText,
+                                lineHeight: 1.2
+                              },
+                              children: data.profile_name || PROFILE_NAME
+                            }
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: 30,
+                                fontWeight: 400,
+                                color: cardSubtext,
+                                lineHeight: 1.3
+                              },
+                              children: data.profile_handle || PROFILE_HANDLE
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              // Text content
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column'
+                  },
+                  children: textElements
+                }
+              }
+            ]
           }
         }
       ].filter(Boolean)
@@ -1093,8 +1264,11 @@ module.exports = async function handler(req, res) {
       case 'cta':
         element = ctaSlide(data, colors);
         break;
+      case 'note':
+        element = noteSlide(data, colors);
+        break;
       default:
-        return res.status(400).json({ error: 'Invalid type. Use: hook, body, or cta' });
+        return res.status(400).json({ error: 'Invalid type. Use: hook, body, cta, or note' });
     }
 
     const fonts = await loadFont(font);
