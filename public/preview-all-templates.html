@@ -534,7 +534,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.78) 70%, rgba(0,0,0,0.92) 100%);
     }
 
     .reel-thumbnail.overlay-green .overlay {
@@ -1480,15 +1480,19 @@
 
   <!-- ==================== PHOTO CAROUSEL TEMPLATES ==================== -->
   <h1 style="font-size: 36px; font-style: italic;">Photo Carousel Templates</h1>
-  <div class="subtitle">P E R S O N A L  C A R O U S E L  &amp;  P H O T O  D U M P</div>
+  <div class="subtitle">P E R S O N A L  C A R O U S E L  &amp;  N O T E  &amp;  P H O T O  D U M P</div>
 
-  <!-- PERSONAL CAROUSEL SPEC -->
+  <!-- MODES SPEC -->
   <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
-    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 250px; text-align: center;">
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 220px; max-width: 280px; text-align: center;">
       <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Personal Carousel</div>
-      <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">Photo backgrounds with text overlay. Hook merges with first body slide. Photo at 20% opacity + black gradient overlay for readability.</div>
+      <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">Photo backgrounds with text overlay. Slide 1 = raw photo. Hook merges with first body slide. Black base + heavy overlay.</div>
     </div>
-    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 250px; text-align: center;">
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 220px; max-width: 280px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Personal Note</div>
+      <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">White card on full photo background. Profile photo + name + handle + text content. Gold accent lines. No overlay on photo.</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 220px; max-width: 280px; text-align: center;">
       <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Photo Dump</div>
       <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">Raw photos resized to 1080x1350. No AI, no text, no overlay. Just photos posted as carousel slides via /api/resize.</div>
     </div>
@@ -1509,9 +1513,9 @@
     <!-- SLIDE 2: Hook + Body merged with overlay -->
     <div class="slide-wrapper">
       <div class="slide-label">Slide 2 — Hook + Body</div>
-      <div class="slide theme-green" style="position: relative;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);"></div>
+      <div class="slide" style="position: relative; background: #0a1315;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.25;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.78) 70%, rgba(0,0,0,0.92) 100%);"></div>
         <div class="gold-line-top"></div>
         <div class="connect-line-right"></div>
         <div style="position: absolute; top: 35px; left: 16px; right: 16px; bottom: 50px; display: flex; flex-direction: column; justify-content: center; z-index: 1;">
@@ -1529,9 +1533,9 @@
     <!-- SLIDE 3: Body with overlay -->
     <div class="slide-wrapper">
       <div class="slide-label">Slide 3 — Body</div>
-      <div class="slide theme-green" style="position: relative;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);"></div>
+      <div class="slide" style="position: relative; background: #0a1315;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.25;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.78) 70%, rgba(0,0,0,0.92) 100%);"></div>
         <div class="slide-number" style="z-index: 1;">3</div>
         <div class="connect-line-left"></div>
         <div class="connect-line-right"></div>
@@ -1550,9 +1554,9 @@
     <!-- CTA with overlay -->
     <div class="slide-wrapper">
       <div class="slide-label">CTA — Photo BG</div>
-      <div class="slide theme-green" style="position: relative;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);"></div>
+      <div class="slide" style="position: relative; background: #0a1315;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.25;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.78) 70%, rgba(0,0,0,0.92) 100%);"></div>
         <div class="connect-line-left"></div>
         <div class="gold-line-bottom"></div>
         <div class="cta-content" style="z-index: 1;">
@@ -1560,6 +1564,88 @@
           <div class="cta-action">DM "SAFE"</div>
           <div class="cta-text">
             <p>to start a conversation about opening up.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL NOTE EXAMPLES -->
+  <div class="section-title">P E R S O N A L  N O T E  —  C A R D  O N  P H O T O</div>
+
+  <div class="example-row">
+    <!-- Note slide 1 -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Note 1 — Hook</div>
+      <div class="slide" style="position: relative; background: #000; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop') center/cover;"></div>
+        <div class="gold-line-top"></div>
+        <div class="gold-line-bottom"></div>
+        <!-- White card -->
+        <div style="position: relative; z-index: 1; background: #fff; border-radius: 6px; padding: 12px 14px; margin: 0 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 184px; width: 184px;">
+          <!-- Profile header -->
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <div style="width: 18px; height: 18px; border-radius: 50%; background: url('https://carousel-image-generator.vercel.app/profile-photo.jpg') center/cover; margin-right: 6px; flex-shrink: 0;"></div>
+            <div>
+              <div style="font-size: 7.5px; font-weight: 600; color: #1a1a1a; line-height: 1.2;">Bastian Gugger</div>
+              <div style="font-size: 6px; color: #666; line-height: 1.3;">@bastiangugger</div>
+            </div>
+          </div>
+          <!-- Text -->
+          <div style="font-size: 8px; color: #1a1a1a; line-height: 1.5; font-weight: 400;">
+            <p style="margin-bottom: 3px;">The biggest lie in entrepreneurship is that you need to have it all figured out.</p>
+            <p style="margin-bottom: 3px;">You don't. You just need to start.</p>
+            <p style="margin-bottom: 0;"><b>Everything else comes after.</b></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note slide 2 -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Note 2 — Body</div>
+      <div class="slide" style="position: relative; background: #000; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover;"></div>
+        <div class="gold-line-top"></div>
+        <div class="gold-line-bottom"></div>
+        <!-- White card -->
+        <div style="position: relative; z-index: 1; background: #fff; border-radius: 6px; padding: 12px 14px; margin: 0 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 184px; width: 184px;">
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <div style="width: 18px; height: 18px; border-radius: 50%; background: url('https://carousel-image-generator.vercel.app/profile-photo.jpg') center/cover; margin-right: 6px; flex-shrink: 0;"></div>
+            <div>
+              <div style="font-size: 7.5px; font-weight: 600; color: #1a1a1a; line-height: 1.2;">Bastian Gugger</div>
+              <div style="font-size: 6px; color: #666; line-height: 1.3;">@bastiangugger</div>
+            </div>
+          </div>
+          <div style="font-size: 8px; color: #1a1a1a; line-height: 1.5; font-weight: 400;">
+            <p style="margin-bottom: 3px;"><b>What I've learned from 10 years of building</b></p>
+            <p style="margin-bottom: 3px;">Speed beats perfection. Every. Single. Time.</p>
+            <p style="margin-bottom: 0;">The people who win aren't the smartest — they're the ones who <i>ship</i>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note slide 3 (CTA) -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Note 3 — CTA</div>
+      <div class="slide" style="position: relative; background: #000; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=500&fit=crop') center/cover;"></div>
+        <div class="gold-line-top"></div>
+        <div class="gold-line-bottom"></div>
+        <!-- White card -->
+        <div style="position: relative; z-index: 1; background: #fff; border-radius: 6px; padding: 12px 14px; margin: 0 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 184px; width: 184px;">
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <div style="width: 18px; height: 18px; border-radius: 50%; background: url('https://carousel-image-generator.vercel.app/profile-photo.jpg') center/cover; margin-right: 6px; flex-shrink: 0;"></div>
+            <div>
+              <div style="font-size: 7.5px; font-weight: 600; color: #1a1a1a; line-height: 1.2;">Bastian Gugger</div>
+              <div style="font-size: 6px; color: #666; line-height: 1.3;">@bastiangugger</div>
+            </div>
+          </div>
+          <div style="font-size: 8px; color: #1a1a1a; line-height: 1.5; font-weight: 400;">
+            <p style="margin-bottom: 3px;">Ready to build something real?</p>
+            <p style="margin-bottom: 3px;"><b>DM "BUILD"</b></p>
+            <p style="margin-bottom: 0;">and let's talk about your next move.</p>
           </div>
         </div>
       </div>
@@ -1605,6 +1691,17 @@
     "background_image": "https://...",
     "body_headline": "Merged body",
     "body_lines": ["Line 1", "Line 2"]
+  }
+}</pre>
+    </div>
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 30px; max-width: 380px;">
+      <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;">POST /api/generate (note)</div>
+      <pre style="color: var(--cream); font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; margin: 0; white-space: pre-wrap;">{
+  "type": "note",
+  "theme": "green",
+  "data": {
+    "background_image": "https://...",
+    "text": ["Line 1", "**Bold line**", "Line 3"]
   }
 }</pre>
     </div>
