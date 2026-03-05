@@ -483,8 +483,7 @@ function hookSlide(data, colors) {
   if (data.background_image) {
     const align = data.align || 'left';
     const alignItemsMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
-    const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
-      : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+    const overlayRgb = '0,0,0';  // Always black overlay for photo backgrounds
     // Always use light text on photo overlay
     const photoColors = { ...colors, text: '#f5f3ef' };
 
@@ -815,10 +814,9 @@ function bodySlide(data, colors, slideNum) {
   const bodyFontSize = data.font_size || CONFIG.sizes.bodyText;
   const headFontSize = data.headline_size || CONFIG.sizes.bodyHeadline;
 
-  // Photo background overlay RGB (matches reel-thumbnail.js pattern)
+  // Photo background overlay
   const hasPhoto = !!data.background_image;
-  const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
-    : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+  const overlayRgb = '0,0,0';  // Always black overlay for photo backgrounds
   // When photo + dark overlay, always use light text (white theme has dark text that won't read)
   const effectiveColors = hasPhoto
     ? { ...colors, text: '#f5f3ef' }
@@ -946,10 +944,9 @@ function bodySlide(data, colors, slideNum) {
 }
 
 function ctaSlide(data, colors) {
-  // Photo background overlay RGB
+  // Photo background overlay
   const hasPhoto = !!data.background_image;
-  const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
-    : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+  const overlayRgb = '0,0,0';  // Always black overlay for photo backgrounds
   // When photo + dark overlay, always use light text
   const effectiveColors = hasPhoto
     ? { ...colors, text: '#f5f3ef' }
