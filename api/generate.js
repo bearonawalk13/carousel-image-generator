@@ -605,7 +605,7 @@ function hookSlide(data, colors) {
           padding: CONFIG.padding
         },
         children: [
-          // Background image — subtle photo hint on black base
+          // Background image — photo visible through dark overlay
           {
             type: 'img',
             props: {
@@ -617,11 +617,11 @@ function hookSlide(data, colors) {
                 width: CONFIG.width,
                 height: CONFIG.height,
                 objectFit: 'cover',
-                opacity: 0.25
+                opacity: 0.45
               }
             }
           },
-          // Heavy black overlay for text readability
+          // Dark overlay for text readability (photo still visible)
           {
             type: 'div',
             props: {
@@ -631,7 +631,7 @@ function hookSlide(data, colors) {
                 left: 0,
                 width: CONFIG.width,
                 height: CONFIG.height,
-                background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
+                background: `linear-gradient(180deg, rgba(${overlayRgb},0.80) 0%, rgba(${overlayRgb},0.55) 30%, rgba(${overlayRgb},0.55) 70%, rgba(${overlayRgb},0.80) 100%)`
               }
             }
           },
@@ -867,7 +867,7 @@ function bodySlide(data, colors, slideNum) {
         padding: CONFIG.padding
       },
       children: [
-        // Photo background (if provided) — subtle hint on black base
+        // Photo background — visible through dark overlay
         hasPhoto ? {
           type: 'img',
           props: {
@@ -879,11 +879,11 @@ function bodySlide(data, colors, slideNum) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.25
+              opacity: 0.45
             }
           }
         } : null,
-        // Heavy black overlay for text readability (only with photo)
+        // Dark overlay for text readability (photo still visible)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -893,7 +893,7 @@ function bodySlide(data, colors, slideNum) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.80) 0%, rgba(${overlayRgb},0.55) 30%, rgba(${overlayRgb},0.55) 70%, rgba(${overlayRgb},0.80) 100%)`
             }
           }
         } : null,
@@ -1004,7 +1004,7 @@ function ctaSlide(data, colors) {
         textAlign: 'center'
       },
       children: [
-        // Photo background (if provided) — subtle hint on black base
+        // Photo background — visible through dark overlay
         hasPhoto ? {
           type: 'img',
           props: {
@@ -1016,11 +1016,11 @@ function ctaSlide(data, colors) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.25
+              opacity: 0.45
             }
           }
         } : null,
-        // Heavy black overlay for text readability (only with photo)
+        // Dark overlay for text readability (photo still visible)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -1030,7 +1030,7 @@ function ctaSlide(data, colors) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.92) 0%, rgba(${overlayRgb},0.78) 30%, rgba(${overlayRgb},0.78) 70%, rgba(${overlayRgb},0.92) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.80) 0%, rgba(${overlayRgb},0.55) 30%, rgba(${overlayRgb},0.55) 70%, rgba(${overlayRgb},0.80) 100%)`
             }
           }
         } : null,
