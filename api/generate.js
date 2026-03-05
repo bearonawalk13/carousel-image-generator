@@ -740,11 +740,11 @@ function bodySlide(data, colors, slideNum) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.5
+              opacity: 0.2
             }
           }
         } : null,
-        // Soft overlay for text readability (only with photo)
+        // Overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -754,7 +754,7 @@ function bodySlide(data, colors, slideNum) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.55) 0%, rgba(${overlayRgb},0.35) 30%, rgba(${overlayRgb},0.35) 70%, rgba(${overlayRgb},0.55) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
             }
           }
         } : null,
@@ -878,11 +878,11 @@ function ctaSlide(data, colors) {
               width: CONFIG.width,
               height: CONFIG.height,
               objectFit: 'cover',
-              opacity: 0.5
+              opacity: 0.2
             }
           }
         } : null,
-        // Soft overlay for text readability (only with photo)
+        // Overlay for text readability (only with photo)
         hasPhoto ? {
           type: 'div',
           props: {
@@ -892,7 +892,7 @@ function ctaSlide(data, colors) {
               left: 0,
               width: CONFIG.width,
               height: CONFIG.height,
-              background: `linear-gradient(180deg, rgba(${overlayRgb},0.55) 0%, rgba(${overlayRgb},0.35) 30%, rgba(${overlayRgb},0.35) 70%, rgba(${overlayRgb},0.55) 100%)`
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
             }
           }
         } : null,
