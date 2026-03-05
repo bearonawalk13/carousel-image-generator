@@ -1089,6 +1089,143 @@
 
   <div class="divider"></div>
 
+  <!-- ==================== PHOTO CAROUSEL TEMPLATES ==================== -->
+  <h1 style="font-size: 36px; font-style: italic;">Photo Carousel Templates</h1>
+  <div class="subtitle">P E R S O N A L  C A R O U S E L  &amp;  P H O T O  D U M P</div>
+
+  <!-- PERSONAL CAROUSEL SPEC -->
+  <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 250px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Personal Carousel</div>
+      <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">Photo backgrounds with text overlay. Hook merges with first body slide. Photo at 20% opacity + gradient overlay for readability.</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 25px 30px; min-width: 250px; text-align: center;">
+      <div style="color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px;">Photo Dump</div>
+      <div style="color: var(--cream); font-size: 14px; line-height: 1.6; opacity: 0.7;">Raw photos resized to 1080x1350. No AI, no text, no overlay. Just photos posted as carousel slides via /api/resize.</div>
+    </div>
+  </div>
+
+  <!-- PERSONAL CAROUSEL EXAMPLES -->
+  <div class="section-title">P E R S O N A L  C A R O U S E L  —  G R E E N</div>
+
+  <div class="example-row">
+    <!-- HOOK (merged with body) -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Hook + Body (Merged)</div>
+      <div class="slide theme-green" style="position: relative;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(12,31,26,0.85) 0%, rgba(12,31,26,0.6) 30%, rgba(12,31,26,0.6) 70%, rgba(12,31,26,0.85) 100%);"></div>
+        <div class="gold-line-top"></div>
+        <div class="connect-line-right"></div>
+        <div style="position: absolute; top: 35px; left: 16px; right: 16px; bottom: 50px; display: flex; flex-direction: column; justify-content: center; z-index: 1;">
+          <h1 style="font-size: 16px; font-weight: 700; font-style: italic; line-height: 1.3; color: var(--cream); margin-bottom: 10px;">The silence that kept you <span class="highlight">safe</span>... now keeps love out.</h1>
+          <h2 style="font-size: 11px; font-weight: 700; color: var(--cream); margin-bottom: 6px;">We learn to protect ourselves</h2>
+          <div style="font-size: 9px; color: var(--cream); opacity: 0.9; line-height: 1.5;">
+            <p style="margin-bottom: 4px;">But the walls we build to keep pain out also keep connection from getting in.</p>
+          </div>
+        </div>
+        <div class="handle-container"><span class="handle-text"><span class="corner-bl"></span>BASTIANGUGGER<span class="corner-tr"></span></span></div>
+        <div class="swipe">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <!-- BODY SLIDE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Body (Photo BG)</div>
+      <div class="slide theme-green" style="position: relative;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(12,31,26,0.85) 0%, rgba(12,31,26,0.6) 30%, rgba(12,31,26,0.6) 70%, rgba(12,31,26,0.85) 100%);"></div>
+        <div class="slide-number" style="z-index: 1;">3</div>
+        <div class="connect-line-left"></div>
+        <div class="connect-line-right"></div>
+        <div class="body-content" style="z-index: 1;">
+          <h2 class="body-headline">Real safety isn't silence</h2>
+          <div class="body-text">
+            <p>It's the ability to speak your truth and still be held.</p>
+            <p>It's letting someone see you — fully — and trusting they'll stay.</p>
+          </div>
+        </div>
+        <div class="handle-container" style="z-index: 1;"><span class="handle-text"><span class="corner-bl"></span>BASTIANGUGGER<span class="corner-tr"></span></span></div>
+        <div class="swipe" style="z-index: 1;">SWIPE <span class="swipe-arrow"></span></div>
+      </div>
+    </div>
+
+    <!-- CTA SLIDE -->
+    <div class="slide-wrapper">
+      <div class="slide-label">CTA (Photo BG)</div>
+      <div class="slide theme-green" style="position: relative;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover; opacity: 0.2;"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(12,31,26,0.85) 0%, rgba(12,31,26,0.6) 30%, rgba(12,31,26,0.6) 70%, rgba(12,31,26,0.85) 100%);"></div>
+        <div class="connect-line-left"></div>
+        <div class="gold-line-bottom"></div>
+        <div class="cta-content" style="z-index: 1;">
+          <h2 class="cta-headline">Ready to let love in?</h2>
+          <div class="cta-action">DM "SAFE"</div>
+          <div class="cta-text">
+            <p>to start a conversation about opening up.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHOTO DUMP EXAMPLES -->
+  <div class="section-title">P H O T O  D U M P  —  R A W  P H O T O S</div>
+
+  <div class="example-row">
+    <div class="slide-wrapper">
+      <div class="slide-label">Photo 1</div>
+      <div class="slide" style="background: #000;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=500&fit=crop') center/cover;"></div>
+      </div>
+    </div>
+    <div class="slide-wrapper">
+      <div class="slide-label">Photo 2</div>
+      <div class="slide" style="background: #000;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=500&fit=crop') center/cover;"></div>
+      </div>
+    </div>
+    <div class="slide-wrapper">
+      <div class="slide-label">Photo 3</div>
+      <div class="slide" style="background: #000;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=500&fit=crop') center/cover;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API SPEC FOR PHOTO CAROUSEL -->
+  <div class="section-title">A P I  E N D P O I N T S</div>
+
+  <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 30px; max-width: 380px;">
+      <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;">POST /api/generate (with photo)</div>
+      <pre style="color: var(--cream); font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; margin: 0; white-space: pre-wrap;">{
+  "type": "hook",
+  "theme": "green",
+  "data": {
+    "text": "Hook text here",
+    "highlight": "word",
+    "background_image": "https://...",
+    "body_headline": "Merged body",
+    "body_lines": ["Line 1", "Line 2"]
+  }
+}</pre>
+    </div>
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(197, 155, 61, 0.15); border-radius: 10px; padding: 30px; max-width: 380px;">
+      <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;">POST /api/resize (Photo Dump)</div>
+      <pre style="color: var(--cream); font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; margin: 0; white-space: pre-wrap;">{
+  "image_url": "https://...",
+  "width": 1080,
+  "height": 1350
+}
+
+Returns: JPEG binary
+Crop mode: cover (center)</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
   <!-- ==================== EMPTY BACKGROUND TEMPLATES ==================== -->
   <h1 style="font-size: 36px; font-style: italic;">Empty Background Templates</h1>
   <div class="subtitle">P R E V I E W  ( F U L L  S E T :  3 0  I M A G E S )</div>
