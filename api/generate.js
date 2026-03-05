@@ -479,6 +479,46 @@ function slideNumber(num, colors) {
 // =============================================================
 
 function hookSlide(data, colors) {
+  // Photo background mode: full photo, no overlay, no text — just branding
+  if (data.background_image) {
+    const align = data.align || 'center';
+    const alignItemsMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+    return {
+      type: 'div',
+      props: {
+        style: {
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: alignItemsMap[align] || 'center',
+          justifyContent: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: colors.background
+        },
+        children: [
+          // Background image
+          {
+            type: 'img',
+            props: {
+              src: data.background_image,
+              style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }
+            }
+          },
+          handleElement(colors),
+          swipeElement(colors)
+        ]
+      }
+    };
+  }
+
   // Build the title content based on format
   let titleContent;
 
@@ -632,6 +672,15 @@ function bodySlide(data, colors, slideNum) {
   const bodyFontSize = data.font_size || CONFIG.sizes.bodyText;
   const headFontSize = data.headline_size || CONFIG.sizes.bodyHeadline;
 
+  // Photo background overlay RGB (matches reel-thumbnail.js pattern)
+  const hasPhoto = !!data.background_image;
+  const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
+    : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+  // When photo + dark overlay, always use light text (white theme has dark text that won't read)
+  const effectiveColors = hasPhoto
+    ? { ...colors, text: '#f5f3ef' }
+    : colors;
+
   // V2.1.0: Safe zone — content must not overflow into handle/swipe/slide-number areas
   // Top: slideNumberTop(60) + slideNumberSize(105) + 30px gap = 195px
   // Bottom: handleBottom(70) + ~50px handle height + 30px gap = 150px
@@ -648,7 +697,7 @@ function bodySlide(data, colors, slideNum) {
         style: {
           fontSize: bodyFontSize,
           fontWeight: 500,
-          color: colors.text,
+          color: effectiveColors.text,
           marginBottom: 16,
           lineHeight: CONFIG.lineHeight,
           // Use flex with baseline alignment to fix text overlap issues
@@ -677,9 +726,38 @@ function bodySlide(data, colors, slideNum) {
         padding: CONFIG.padding
       },
       children: [
-        slideNumber(slideNum, colors),
-        connectLineLeft(colors),
-        connectLineRight(colors),
+        // Photo background (if provided)
+        hasPhoto ? {
+          type: 'img',
+          props: {
+            src: data.background_image,
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }
+          }
+        } : null,
+        // Overlay for text readability (only with photo)
+        hasPhoto ? {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+            }
+          }
+        } : null,
+        slideNumber(slideNum, effectiveColors),
+        connectLineLeft(effectiveColors),
+        connectLineRight(effectiveColors),
         // Content container with safe zone enforcement
         {
           type: 'div',
@@ -699,7 +777,7 @@ function bodySlide(data, colors, slideNum) {
                   style: {
                     fontSize: headFontSize,
                     fontWeight: 700,
-                    color: colors.text,
+                    color: effectiveColors.text,
                     marginBottom: CONFIG.headlineBodyGap,
                     lineHeight: CONFIG.lineHeight
                   },
@@ -716,17 +794,26 @@ function bodySlide(data, colors, slideNum) {
             ].filter(Boolean)
           }
         },
-        handleElement(colors),
-        swipeElement(colors)
-      ]
+        handleElement(effectiveColors),
+        swipeElement(effectiveColors)
+      ].filter(Boolean)
     }
   };
 }
 
 function ctaSlide(data, colors) {
+  // Photo background overlay RGB
+  const hasPhoto = !!data.background_image;
+  const overlayRgb = colors.background === '#0c1f1a' ? '12,31,26'
+    : colors.background === '#ede5d8' ? '0,0,0' : '0,0,0';
+  // When photo + dark overlay, always use light text
+  const effectiveColors = hasPhoto
+    ? { ...colors, text: '#f5f3ef' }
+    : colors;
+
   const lines = (data.lines || []).map(line => {
     let size = CONFIG.sizes.ctaBody;
-    let color = colors.text;
+    let color = effectiveColors.text;
     let weight = 500;  // Slightly bolder than 400 for better readability
     let marginTop = 0;
     let marginBottom = 24;
@@ -736,7 +823,7 @@ function ctaSlide(data, colors) {
       weight = 600;
     } else if (line.style === 'action') {
       size = CONFIG.sizes.ctaAction;
-      color = colors.gold;
+      color = effectiveColors.gold;
       weight = 700;
       // Add extra spacing above and below action for emphasis
       marginTop = 40;
@@ -776,8 +863,38 @@ function ctaSlide(data, colors) {
         textAlign: 'center'
       },
       children: [
-        connectLineLeft(colors),
-        goldLineBottom(colors),
+        // Photo background (if provided)
+        hasPhoto ? {
+          type: 'img',
+          props: {
+            src: data.background_image,
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }
+          }
+        } : null,
+        // Overlay for text readability (only with photo)
+        hasPhoto ? {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: `linear-gradient(180deg, rgba(${overlayRgb},0.85) 0%, rgba(${overlayRgb},0.6) 30%, rgba(${overlayRgb},0.6) 70%, rgba(${overlayRgb},0.85) 100%)`
+            }
+          }
+        } : null,
+        // Decorative lines only on solid backgrounds
+        hasPhoto ? null : connectLineLeft(colors),
+        hasPhoto ? null : goldLineBottom(colors),
         {
           type: 'div',
           props: {
@@ -790,7 +907,7 @@ function ctaSlide(data, colors) {
             children: lines
           }
         }
-      ]
+      ].filter(Boolean)
     }
   };
 }
