@@ -1075,14 +1075,14 @@ function noteSlide(data, colors) {
     : [data.text || ''];
 
   const textElements = textContent.map(line => {
-    const styledContent = parseStyledText(line, 500);
+    const styledContent = parseStyledText(line, 700);
     const hasMarkup = Array.isArray(styledContent);
     return {
       type: 'div',
       props: {
         style: {
           fontSize: 46,
-          fontWeight: 500,
+          fontWeight: 700,
           color: cardText,
           lineHeight: 1.45,
           marginBottom: 12,
@@ -1104,7 +1104,8 @@ function noteSlide(data, colors) {
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: '#000000'
+        backgroundColor: '#000000',
+        paddingTop: 120
       },
       children: [
         // Background image — full photo, no opacity reduction
