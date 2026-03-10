@@ -308,19 +308,30 @@ module.exports = async function handler(req, res) {
     const renderWidth = cardWidth * cardScale;
 
     // Load font + photo in parallel
-    const [fonts, photoData] = await Promise.all([
-      loadFonts(),
-      fetchPhoto(data.photo_url),
-    ]);
+    let fonts, photoData;
+    try {
+      [fonts, photoData] = await Promise.all([
+        loadFonts(),
+        fetchPhoto(data.photo_url),
+      ]);
+    } catch (fontErr) {
+      return res.status(500).json({ error: 'Font loading failed: ' + fontErr.message });
+    }
 
     // Build the card element
     const element = buildCard(data, photoData);
 
     // Render with Satori
-    const svg = await satori(element, {
-      width: renderWidth,
-      fonts,
-    });
+    let svg;
+    try {
+      svg = await satori(element, {
+        width: renderWidth,
+        height: renderWidth, // satori needs height; will be cropped to content
+        fonts,
+      });
+    } catch (satoriErr) {
+      return res.status(500).json({ error: 'Satori render failed: ' + satoriErr.message });
+    }
 
     // Convert SVG to PNG with Resvg
     const resvg = new Resvg(svg, {
@@ -336,6 +347,6 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('Review card error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message, stack: err.stack });
   }
 };
