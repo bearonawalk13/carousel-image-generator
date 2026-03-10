@@ -328,7 +328,6 @@ module.exports = async function handler(req, res) {
     try {
       svg = await satori(element, {
         width: renderWidth,
-        height: renderWidth, // satori needs height; will be cropped to content
         fonts,
       });
     } catch (satoriErr) {
