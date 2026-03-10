@@ -34,10 +34,10 @@ const CONFIG = {
   borderRadius: 8,
 };
 
-// Roboto font (Google's standard UI font)
+// Roboto font via jsDelivr (reliable CDN, serves WOFF which satori supports)
 const FONT_URLS = {
-  regular: 'https://fonts.gstatic.com/s/roboto/v47/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbGmT.ttf',
-  medium: 'https://fonts.gstatic.com/s/roboto/v47/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabGmT.ttf',
+  regular: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-normal.woff',
+  medium: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-500-normal.woff',
 };
 
 async function loadFonts() {
