@@ -201,6 +201,8 @@ function buildCard(data, photoData) {
     type: 'div',
     props: {
       style: {
+        display: 'flex',
+        flexDirection: 'column',
         fontSize: 14,
         color: CONFIG.textColor,
         lineHeight: '21px',
@@ -210,7 +212,7 @@ function buildCard(data, photoData) {
       children: textLines.map((line, i) => ({
         type: 'div',
         props: {
-          style: { marginBottom: i < textLines.length - 1 ? 4 : 0 },
+          style: { display: 'flex', marginBottom: i < textLines.length - 1 ? 4 : 0 },
           children: line
         }
       }))
@@ -347,6 +349,6 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('Review card error:', err);
-    return res.status(500).json({ error: err.message, stack: err.stack });
+    return res.status(500).json({ error: err.message });
   }
 };
