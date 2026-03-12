@@ -1,5 +1,5 @@
 /**
- * Phase 5: Analytics Collector + AI Diagnosis + Monthly Reports
+ * Phase 5: Analytics Collector + Engagement Scoring + AI Diagnosis + Monthly Reports
  *
  * Vercel Cron Job — runs daily at 07:00 UTC
  *
@@ -7,10 +7,20 @@
  * 1. Query published assets needing 48h or 7d metrics collection
  * 2. Call Upload Post Analytics API for each
  * 3. Write metrics to Airtable Assets
- * 4. Run AI bottleneck diagnosis (OpenRouter/Claude) for 7d snapshots
+ * 3a. Compute deterministic engagement scores (Resonance, Depth, Reach, Conversion, Overall)
+ * 3b. Run AI bottleneck diagnosis (OpenRouter/Claude) for qualitative analysis
+ * 3c. Sweep existing assets to re-score if metrics changed or scores were missing
+ * 4. Winner feedback loop — update parent inspirations
  * 5. Update Brand Codex with profile metrics
  * 6. On Mondays: rotate snapshots + send weekly Telegram report
  * 7. On 1st of month: per-platform monthly analysis → 05_Monthly Reports + Brand Codex Performance Intelligence
+ *
+ * Scoring Formulas (deterministic, not AI-generated):
+ *   Resonance Score  = saves(7d)*3 + shares(7d)*4 + comments(7d)*5 + likes(7d)*1
+ *   Depth Score      = saves(7d)*3 + shares(7d)*4 + comments(7d)*5
+ *   Reach Score      = reach(7d)*0.01 + views(7d)*0.05 + likes(7d)*0.5
+ *   Conversion Score = comments(7d)*5 + shares(7d)*3
+ *   Overall Score    = resonance*0.4 + reach_score*0.3 + depth*0.3
  */
 
 // ============================================================
@@ -598,6 +608,95 @@ async function sendTelegram(message) {
 }
 
 // ============================================================
+// DETERMINISTIC ENGAGEMENT SCORING
+// ============================================================
+
+/**
+ * Compute engagement scores from raw 7d metrics using fixed formulas.
+ * These are deterministic (not AI-generated) so they're consistent and reproducible.
+ *
+ * Formulas:
+ *   Resonance Score = saves*3 + shares*4 + comments*5 + likes*1
+ *   Depth Score     = saves*3 + shares*4 + comments*5  (high-intent only)
+ *   Reach Score     = reach*0.01 + views*0.05 + likes*0.5
+ *   Conversion Score = comments*5 + shares*3
+ *   Overall Score   = resonance*0.4 + reach_score*0.3 + depth*0.3
+ */
+function computeEngagementScores(fields) {
+  const saves    = fields['Saves (7d)']    || 0;
+  const shares   = fields['Shares (7d)']   || 0;
+  const comments = fields['Comments (7d)'] || 0;
+  const likes    = fields['Likes (7d)']    || 0;
+  const reach    = fields['Reach (7d)']    || 0;
+  const views    = fields['Views (7d)']    || 0;
+
+  const resonance  = saves * 3 + shares * 4 + comments * 5 + likes * 1;
+  const depth      = saves * 3 + shares * 4 + comments * 5;
+  const reachScore = Math.round((reach * 0.01 + views * 0.05 + likes * 0.5) * 10) / 10;
+  const conversion = comments * 5 + shares * 3;
+  const overall    = Math.round((resonance * 0.4 + reachScore * 0.3 + depth * 0.3) * 10) / 10;
+
+  return {
+    'Resonance Score': resonance,
+    'Depth Score': depth,
+    'Reach Score': reachScore,
+    'Conversion Score': conversion,
+    'Overall Score': overall,
+  };
+}
+
+/**
+ * Check if deterministic scores need updating for a record.
+ * Returns the scores object if update needed, null otherwise.
+ */
+function scoresNeedUpdate(fields) {
+  // Must have 7d metrics collected
+  if (!fields['Metrics (7d) Collected At']) return null;
+
+  const newScores = computeEngagementScores(fields);
+
+  for (const [key, val] of Object.entries(newScores)) {
+    const current = fields[key] || 0;
+    if (Math.abs(current - val) > 0.01) return newScores;
+  }
+
+  return null; // All scores already match
+}
+
+/**
+ * Batch update records in groups of 10 (Airtable limit).
+ */
+async function airtableBatchPatch(tableId, updates) {
+  const baseId = getEnv('AIRTABLE_BASE_ID');
+  const token = getEnv('AIRTABLE_TOKEN');
+  let updated = 0;
+
+  for (let i = 0; i < updates.length; i += 10) {
+    const batch = updates.slice(i, i + 10);
+    const resp = await fetch(`${AIRTABLE_BASE_URL}/${baseId}/${tableId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        records: batch.map(u => ({ id: u.id, fields: u.fields }))
+      })
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`Airtable batch patch failed at index ${i}: ${resp.status} ${text.substring(0, 200)}`);
+    }
+
+    updated += batch.length;
+    if (i + 10 < updates.length) await sleep(200); // Rate limit between batches
+  }
+
+  return updated;
+}
+
+// ============================================================
 // COMPUTE BASELINES
 // ============================================================
 
@@ -749,9 +848,11 @@ module.exports = async (req, res) => {
         'Title', 'Asset Code', 'Platform', 'Content Format', 'Content Pillar',
         'SSF Lane', 'CTA Final', 'Message Framework', 'Opening Line', 'Body',
         'Closing Prompt', 'Published At', 'Published URL', 'Upload Post Request ID',
-        'Reach (48h)', 'Reach (7d)', 'Views (7d)', 'Likes (7d)', 'Comments (7d)',
-        'Saves (7d)', 'Shares (7d)', 'Overall Score', 'Bottleneck',
-        'Metrics (48h) Collected At', 'Metrics (7d) Collected At',
+        'Reach (48h)', 'Views (48h)', 'Likes (48h)', 'Comments (48h)', 'Saves (48h)', 'Shares (48h)',
+        'Reach (7d)', 'Views (7d)', 'Likes (7d)', 'Comments (7d)',
+        'Saves (7d)', 'Shares (7d)',
+        'Resonance Score', 'Depth Score', 'Reach Score', 'Conversion Score', 'Overall Score',
+        'Bottleneck', 'Metrics (48h) Collected At', 'Metrics (7d) Collected At',
         'Parent Inspiration', 'Sequel Candidate', 'Remix Candidate'
       ]
     });
@@ -822,7 +923,19 @@ module.exports = async (req, res) => {
           'Metrics (7d) Collected At': new Date().toISOString()
         };
 
-        // Run AI diagnosis
+        // Compute deterministic engagement scores from raw metrics
+        const metricsFields = {
+          'Saves (7d)': metrics.saves,
+          'Shares (7d)': metrics.shares,
+          'Comments (7d)': metrics.comments,
+          'Likes (7d)': metrics.likes,
+          'Reach (7d)': metrics.reach,
+          'Views (7d)': metrics.views,
+        };
+        const engagementScores = computeEngagementScores(metricsFields);
+        Object.assign(updateFields, engagementScores);
+
+        // Run AI diagnosis (qualitative analysis — bottleneck, reasons, fixes)
         const metrics48h = {
           reach: f['Reach (48h)'] || 0,
           views: f['Views (48h)'] || 0,
@@ -836,18 +949,16 @@ module.exports = async (req, res) => {
         const diagnosis = await runAIDiagnosis(f, metrics48h, metrics, baselines, outputLanguage);
 
         if (diagnosis) {
-          updateFields['Overall Score'] = diagnosis.overall_score || 0;
-          updateFields['Reach Score'] = diagnosis.reach_score || 0;
-          updateFields['Depth Score'] = diagnosis.depth_score || 0;
+          // AI diagnosis provides qualitative fields only — scores come from deterministic formulas above
           updateFields['Bottleneck'] = { name: diagnosis.bottleneck || 'Unclear' };
           updateFields['Bottleneck Confidence'] = { name: diagnosis.confidence || 'Low' };
           updateFields['Bottleneck Reasons'] = (diagnosis.reasons || []).map((r, i) => `${i + 1}. ${r}`).join('\n');
           updateFields['Fix Suggestions'] = (diagnosis.fixes || []).map((f, i) => `${i + 1}. ${f}`).join('\n');
           updateFields['Sequel Candidate'] = diagnosis.sequel_candidate || false;
           updateFields['Remix Candidate'] = diagnosis.remix_candidate || false;
-          log.push(`  7d+AI: ${f['Asset Code']} — Score:${diagnosis.overall_score} Bottleneck:${diagnosis.bottleneck}`);
+          log.push(`  7d+AI: ${f['Asset Code']} — R:${engagementScores['Resonance Score']} D:${engagementScores['Depth Score']} C:${engagementScores['Conversion Score']} Rch:${engagementScores['Reach Score']} O:${engagementScores['Overall Score']} Bottleneck:${diagnosis.bottleneck}`);
         } else {
-          log.push(`  7d: ${f['Asset Code']} — metrics saved, AI diagnosis failed`);
+          log.push(`  7d: ${f['Asset Code']} — metrics+scores saved, AI diagnosis failed (R:${engagementScores['Resonance Score']} O:${engagementScores['Overall Score']})`);
         }
 
         await airtablePatch(ASSETS_TABLE, asset.id, updateFields);
@@ -867,6 +978,37 @@ module.exports = async (req, res) => {
       } catch (err) {
         errors.push(`Winner feedback loop: ${err.message}`);
       }
+    }
+
+    // --------------------------------------------------------
+    // 3c. Engagement score sweep — re-score existing assets
+    //     Catches assets that had 7d metrics before scoring was added,
+    //     or where metrics were manually updated.
+    // --------------------------------------------------------
+    try {
+      const alreadyCollected7d = allAssets.filter(a => {
+        const f = a.fields;
+        // Has 7d metrics but was NOT just collected in step 3 (already handled above)
+        return f['Metrics (7d) Collected At'] &&
+          !needs7d.some(n => n.id === a.id);
+      });
+
+      const scoreUpdates = [];
+      for (const asset of alreadyCollected7d) {
+        const newScores = scoresNeedUpdate(asset.fields);
+        if (newScores) {
+          scoreUpdates.push({ id: asset.id, fields: newScores });
+        }
+      }
+
+      if (scoreUpdates.length > 0) {
+        const updated = await airtableBatchPatch(ASSETS_TABLE, scoreUpdates);
+        log.push(`Score sweep: updated ${updated} existing assets with deterministic scores`);
+      } else {
+        log.push(`Score sweep: all existing scores up to date`);
+      }
+    } catch (err) {
+      errors.push(`Score sweep: ${err.message}`);
     }
 
     // --------------------------------------------------------
