@@ -20,6 +20,10 @@
     "api/review-card.js": {
       "memory": 1024,
       "maxDuration": 30
+    },
+    "api/merge-pdf.js": {
+      "memory": 1024,
+      "maxDuration": 30
     }
   },
   "crons": [
